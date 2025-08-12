@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Participantes - {{ taller.nombre }} | APRODMAYO{% endblock %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'css/action-buttons.css' %}">
+<style>
+    .filter-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .participante-card {
+        transition: transform .2s;
+    }
+    .participante-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+    .state-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .state-confirmado {
+        background-color: #28a745;
+    }
+    .state-pendiente {
+        background-color: #ffc107;
+    }
+    .state-retirado {
+        background-color: #dc3545;
+    }
+    .stats-card {
+        border-left: 4px solid #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado y navegación -->
+    <nav class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'taller_list' %}">Talleres</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'taller_detail' taller.id %}">{{ taller.nombre }}</a></li>
+            <li class="breadcrumb-item active">Participantes</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0">
+            <i class="fas fa-users me-2"></i>
+            Participantes del Taller
+        </h1>
+        <a href="{% url 'participante_create' taller.id %}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Inscribir Participante
+        </a>
+    </div>
+    
+    <!-- Tarjetas de estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-muted">Participantes</h5>
+                            <h2 class="display-5">{{ total_participantes }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-3x text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card h-100" style="border-left-color: #28a745;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-muted">Capacidad</h5>
+                            <h2 class="display-5">{{ capacidad }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-3x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card h-100" style="border-left-color: #17a2b8;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title text-muted">Disponible</h5>
+                            <h2 class="display-5">{{ disponibilidad }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clipboard-check fa-3x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filter-section mb-4">
+        <form method="get" class="row align-items-center">
+            <div class="col-md-6 mb-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" name="q" value="{{ request.GET.q }}" 
+                           class="form-control" placeholder="Buscar por nombre, DNI, etc.">
+                </div>
+            </div>
+            <div class="col-md-4 mb-2">
+                <select name="estado" class="form-select">
+                    <option value="">-- Filtrar por Estado --</option>
+                    <option value="CONFIRMADO" {% if request.GET.estado == 'CONFIRMADO' %}selected{% endif %}>Confirmado</option>
+                    <option value="PENDIENTE" {% if request.GET.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+                    <option value="RETIRADO" {% if request.GET.estado == 'RETIRADO' %}selected{% endif %}>Retirado</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Lista de participantes -->
+    {% if participantes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>DNI</th>
+                        <th>Contacto</th>
+                        <th>Estado</th>
+                        <th>Tipo</th>
+                        <th>Fecha Inscripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participante in participantes %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="state-indicator state-{{ participante.estado|lower }}"></div>
+                                    <div>
+                                        <div class="fw-bold">{{ participante.apellidos }}, {{ participante.nombres }}</div>
+                                        {% if participante.beneficiaria %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-link me-1"></i>Beneficiaria
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ participante.dni }}</td>
+                            <td>
+                                {% if participante.telefono %}
+                                    <div><i class="fas fa-phone-alt me-1 text-muted"></i>{{ participante.telefono }}</div>
+                                {% endif %}
+                                {% if participante.email %}
+                                    <div><i class="fas fa-envelope me-1 text-muted"></i>{{ participante.email }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participante.estado == 'CONFIRMADO' %}
+                                    <span class="badge bg-success">Confirmado</span>
+                                {% elif participante.estado == 'PENDIENTE' %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Retirado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participante.tipo == 'BENEFICIARIA' %}
+                                    <span class="badge bg-primary">Beneficiaria</span>
+                                {% elif participante.tipo == 'FAMILIAR' %}
+                                    <span class="badge bg-info">Familiar</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Externo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ participante.fecha_inscripcion|date:"d/m/Y" }}</td>
+                            <td>
+                                <div class="d-flex gap-1 action-buttons-container">
+                                    <a href="{% url 'participante_detail' participante.id %}" 
+                                       class="btn btn-sm btn-outline-primary btn-action" title="Ver detalles">
+                                        <i class="fas fa-eye"></i> <span class="btn-text">Ver</span>
+                                    </a>
+                                    {% if participante.estado == 'CONFIRMADO' %}
+                                    <a href="{% url 'generar_certificado' participante.id %}"
+                                       class="btn btn-sm btn-outline-success btn-action" title="Emitir Certificado">
+                                        <i class="fas fa-certificate"></i> <span class="btn-text">Emitir Certificado</span>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'participante_update' participante.id %}"
+                                       class="btn btn-sm btn-outline-secondary btn-action" title="Editar">
+                                        <i class="fas fa-edit"></i> <span class="btn-text">Editar</span>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'participante_delete' participante.id %}" 
+                                       class="btn btn-sm btn-outline-danger btn-action" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i> <span class="btn-text">Eliminar</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginación -->
+        {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay participantes registrados en este taller con los criterios seleccionados.
+            {% if taller.disponibilidad > 0 %}
+                <div class="mt-3">
+                    <a href="{% url 'participante_create' taller.id %}" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Inscribir Participante
+                    </a>
+                </div>
+            {% else %}
+                <div class="mt-3">
+                    <span class="badge bg-danger">El taller ha alcanzado su capacidad máxima</span>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

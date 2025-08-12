@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load form_utils %}
+
+{% block title %}{% if object %}Editar{% else %}Registrar{% endif %} Pago de Socio - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{% if object %}Editar{% else %}Registrar{% endif %} Pago de Socio</h2>
+        <a href="{% if socio %}{% url 'socio_detail' socio.id %}{% else %}{% url 'socio_list' %}{% endif %}" class="btn btn-light">Volver</a>
+    </div>
+    <div class="card-body">
+        {% if not object and socio and socio.fecha_registro|date:"m" == now|date:"m" %}
+            <div class="alert alert-warning mb-4">
+                <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Importante</h5>
+                <p>Este socio se ha registrado en el mes actual ({{ now|date:"F Y" }}). La primera cuota debe ser pagada por el mes en curso aunque se haya registrado en los últimos días del mes.</p>
+            </div>
+        {% endif %}
+        
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% if not socio %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="{{ form.socio.id_for_label }}" class="form-label">Socio <span class="text-danger">*</span></label>
+                            {{ form.socio|add_class:"form-select"|add_error_class:"is-invalid" }}
+                            {% if form.socio.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.socio.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha de Pago <span class="text-danger">*</span></label>
+                        {{ form.fecha|add_class:"form-control"|add_error_class:"is-invalid" }}
+                        {% if form.fecha.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.fecha.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.monto.id_for_label }}" class="form-label">Monto (S/.) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">S/.</span>
+                            {{ form.monto|add_class:"form-control"|add_error_class:"is-invalid" }}
+                            {% if form.monto.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.monto.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.periodo_mes.id_for_label }}" class="form-label">Mes <span class="text-danger">*</span></label>
+                        {{ form.periodo_mes|add_class:"form-select"|add_error_class:"is-invalid" }}
+                        {% if form.periodo_mes.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.periodo_mes.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.periodo_anio.id_for_label }}" class="form-label">Año <span class="text-danger">*</span></label>
+                        {{ form.periodo_anio|add_class:"form-select"|add_error_class:"is-invalid" }}
+                        {% if form.periodo_anio.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.periodo_anio.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.comprobante.id_for_label }}" class="form-label">Número de Comprobante</label>
+                        {{ form.comprobante|add_class:"form-control"|add_error_class:"is-invalid" }}
+                        {% if form.comprobante.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.comprobante.errors.0 }}
+                            </div>
+                        {% else %}
+                            <div class="form-text">
+                                {% if object %}
+                                    El número de comprobante no se puede modificar.
+                                {% else %}
+                                    El número de comprobante se genera automáticamente de forma secuencial.
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-check mt-4">
+                            {{ form.registrar_ingreso }}
+                            <label class="form-check-label" for="{{ form.registrar_ingreso.id_for_label }}">
+                                Registrar también como ingreso
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+                        {{ form.observaciones|add_class:"form-control"|add_error_class:"is-invalid" }}
+                        {% if form.observaciones.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.observaciones.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% if socio %}{% url 'socio_detail' socio.id %}{% else %}{% url 'socio_list' %}{% endif %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Actualizar{% else %}Registrar{% endif %} Pago
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación del formulario
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %}

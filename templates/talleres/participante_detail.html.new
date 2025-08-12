@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ participante.nombres }} {{ participante.apellidos }} | APRODMAYO{% endblock %}
+
+{% block custom_css %}
+<style>
+    .info-card {
+        transition: all .2s;
+    }
+    .info-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .section-title {
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .detail-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .detail-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .detail-list li:last-child {
+        border-bottom: none;
+    }
+    .progress-wrapper {
+        position: relative;
+        height: 10px;
+    }
+    .progress-label {
+        position: absolute;
+        right: 0;
+        top: -25px;
+    }
+    .badge-tipo {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.9rem;
+    }
+    .badge-estado {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 0.9rem;
+    }
+    .asistencia-presente {
+        background-color: rgba(40, 167, 69, 0.2);
+    }
+    .asistencia-tardanza {
+        background-color: rgba(255, 193, 7, 0.2);
+    }
+    .asistencia-ausente {
+        background-color: rgba(220, 53, 69, 0.2);
+    }
+    .asistencia-justificado {
+        background-color: rgba(23, 162, 184, 0.2);
+    }
+    .section-header {
+        background-color: #f8f9fa;
+        border-left: 4px solid #0d6efd;
+        padding: 10px 15px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'taller_list' %}">Talleres</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'taller_detail' participante.taller.id %}">{{ participante.taller.nombre }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'participante_list' participante.taller.id %}">Participantes</a></li>
+            <li class="breadcrumb-item active">{{ participante.nombres }} {{ participante.apellidos }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Columna principal -->
+        <div class="col-lg-8">
+            <!-- Tarjeta de información principal -->
+            <div class="card mb-4 position-relative">
+                {% if participante.tipo == 'BENEFICIARIA' %}
+                    <span class="badge-tipo badge bg-primary">Beneficiaria</span>
+                {% elif participante.tipo == 'FAMILIAR' %}
+                    <span class="badge-tipo badge bg-info">Familiar</span>
+                {% else %}
+                    <span class="badge-tipo badge bg-secondary">Externo</span>
+                {% endif %}
+                
+                {% if participante.estado == 'CONFIRMADO' %}
+                    <span class="badge-estado badge bg-success">Confirmado</span>
+                {% elif participante.estado == 'PENDIENTE' %}
+                    <span class="badge-estado badge bg-warning">Pendiente</span>
+                {% else %}
+                    <span class="badge-estado badge bg-danger">Retirado</span>
+                {% endif %}
+                
+                <div class="card-body pt-5">
+                    <div class="text-center mb-4">
+                        <div class="display-4">{{ participante.nombres }} {{ participante.apellidos }}</div>
+                        <p class="text-muted mb-0">DNI: {{ participante.dni }}</p>
+                        
+                        {% if participante.beneficiaria %}
+                            <div class="mt-2">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-link me-1"></i>
+                                    Beneficiaria Vinculada
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3 text-center">
+                                    <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Fecha de Inscripción</small>
+                                    <div class="fw-bold">{{ participante.fecha_inscripcion|date:"d/m/Y" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3 text-center">
+                                    <i class="fas fa-birthday-cake fa-2x text-danger"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Fecha de Nacimiento</small>
+                                    <div class="fw-bold">{{ participante.fecha_nacimiento|default:"No registrada" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3 text-center">
+                                    <i class="fas fa-phone-alt fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Teléfono</small>
+                                    <div class="fw-bold">{{ participante.telefono|default:"No registrado" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3 text-center">
+                                    <i class="fas fa-envelope fa-2x text-info"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Email</small>
+                                    <div class="fw-bold">{{ participante.email|default:"No registrado" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if participante.direccion %}
+                        <div class="mt-3">
+                            <h5 class="fw-bold">Dirección</h5>
+                            <p>{{ participante.direccion }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if participante.observaciones %}
+                        <div class="mt-3">
+                            <h5 class="fw-bold">Observaciones</h5>
+                            <p>{{ participante.observaciones }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'participante_list' participante.taller.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+                        </a>
+                        <div>
+                            <a href="{% url 'participante_update' participante.id %}" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-edit me-2"></i>Editar
+                            </a>
+                            <a href="{% url 'participante_delete' participante.id %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sección de Asistencia (reemplazando pestañas) -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Asistencia</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Registro de Asistencia</h5>
+                        <a href="{% url 'asistencia_create' participante.taller.id %}?participante={{ participante.id }}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i>Registrar
+                        </a>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Presentes</h5>
+                                    <h2 class="display-4">{{ total_asistencias }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Tardanzas</h5>
+                                    <h2 class="display-4">{{ total_tardanzas }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-danger h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Ausencias</h5>
+                                    <h2 class="display-4">{{ total_ausencias }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Justificadas</h5>
+                                    <h2 class="display-4">{{ total_justificadas }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-wrapper mb-4">
+                        <div class="progress-label">
+                            <strong>{{ porcentaje_asistencia|floatformat:1 }}%</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: {{ porcentaje_asistencia }}%;"></div>
+                        </div>
+                        <small class="text-muted">Porcentaje de asistencia</small>
+                    </div>
+                    
+                    {% if asistencias %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Observaciones</th>
+                                        <th>Registrado por</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asistencia in asistencias %}
+                                        <tr class="asistencia-{{ asistencia.estado|lower }}">
+                                            <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if asistencia.estado == 'PRESENTE' %}
+                                                    <span class="badge bg-success">Presente</span>
+                                                {% elif asistencia.estado == 'TARDANZA' %}
+                                                    <span class="badge bg-warning">Tardanza</span>
+                                                {% elif asistencia.estado == 'AUSENTE' %}
+                                                    <span class="badge bg-danger">Ausente</span>
+                                                {% else %}
+                                                    <span class="badge bg-info">Justificado</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ asistencia.observaciones|default:"" }}
+                                            </td>
+                                            <td>{{ asistencia.registrado_por }}</td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{% url 'asistencia_update' asistencia.id %}" 
+                                                       class="btn btn-sm btn-outline-secondary" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'asistencia_delete' asistencia.id %}" 
+                                                       class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay registros de asistencia para este participante.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Sección de Evaluaciones (reemplazando pestañas) -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="fas fa-star-half-alt me-2"></i>Evaluaciones</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Evaluaciones</h5>
+                        <a href="{% url 'evaluacion_create' participante.taller.id %}?participante={{ participante.id }}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus me-1"></i>Nueva Evaluación
+                        </a>
+                    </div>
+                    
+                    {% if evaluaciones %}
+                        <div class="mb-4">
+                            <h5>Promedio de calificaciones: 
+                                {% if promedio_calificaciones %}
+                                    <span class="badge bg-primary">{{ promedio_calificaciones|floatformat:1 }}/20</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Sin calificaciones</span>
+                                {% endif %}
+                            </h5>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Calificación</th>
+                                        <th>Nivel de Logro</th>
+                                        <th>Comentarios</th>
+                                        <th>Evaluador</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evaluacion in evaluaciones %}
+                                        <tr>
+                                            <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if evaluacion.calificacion %}
+                                                    <span class="badge 
+                                                        {% if evaluacion.calificacion >= 14 %}bg-success
+                                                        {% elif evaluacion.calificacion >= 11 %}bg-primary
+                                                        {% else %}bg-danger{% endif %}">
+                                                        {{ evaluacion.calificacion }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ evaluacion.get_nivel_logro_display }}</td>
+                                            <td>{{ evaluacion.comentarios|truncatechars:50 }}</td>
+                                            <td>{{ evaluacion.evaluador }}</td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    <a href="{% url 'evaluacion_detail' evaluacion.id %}" 
+                                                       class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'evaluacion_update' evaluacion.id %}" 
+                                                       class="btn btn-sm btn-outline-secondary" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'evaluacion_delete' evaluacion.id %}" 
+                                                       class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No hay evaluaciones registradas para este participante.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Columna lateral -->
+        <div class="col-lg-4">
+            <!-- Información del Taller -->
+            <div class="card mb-4 info-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>
+                        Información del Taller
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold">{{ participante.taller.nombre }}</h5>
+                    <p class="text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ participante.taller.fecha_inicio|date:"d/m/Y" }} - {{ participante.taller.fecha_fin|date:"d/m/Y" }}
+                    </p>
+                    <p class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ participante.taller.horario }}
+                    </p>
+                    <p class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ participante.taller.lugar }}
+                    </p>
+                    <p class="text-muted">
+                        <i class="fas fa-user-tie me-1"></i>
+                        {{ participante.taller.facilitador }}
+                    </p>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{% url 'taller_detail' participante.taller.id %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-eye me-1"></i>Ver taller
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Acciones Rápidas -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Acciones Rápidas</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'asistencia_create' participante.taller.id %}?participante={{ participante.id }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Registrar Asistencia</h6>
+                            <i class="fas fa-clipboard-check text-success"></i>
+                        </div>
+                        <small class="text-muted">Añadir nuevo registro de asistencia</small>
+                    </a>
+                    <a href="{% url 'evaluacion_create' participante.taller.id %}?participante={{ participante.id }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Nueva Evaluación</h6>
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        </div>
+                        <small class="text-muted">Registrar una evaluación para el participante</small>
+                    </a>
+                    <a href="{% url 'participante_update' participante.id %}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Editar Información</h6>
+                            <i class="fas fa-edit text-primary"></i>
+                        </div>
+                        <small class="text-muted">Actualizar datos del participante</small>
+                    </a>
+                    <a href="{% url 'participante_delete' participante.id %}" 
+                       class="list-group-item list-group-item-action text-danger">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Eliminar Participante</h6>
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <small>Eliminar al participante del taller</small>
+                    </a>
+                </div>
+            </div>
+            
+            {% if participante.beneficiaria %}
+            <!-- Información de Beneficiaria -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-link me-2"></i>
+                        Beneficiaria Vinculada
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold">{{ participante.beneficiaria.nombres }} {{ participante.beneficiaria.apellidos }}</h5>
+                    <p class="text-muted">
+                        <i class="fas fa-id-card me-1"></i>
+                        DNI: {{ participante.beneficiaria.dni }}
+                    </p>
+                    {% if participante.beneficiaria.telefono %}
+                        <p class="text-muted">
+                            <i class="fas fa-phone-alt me-1"></i>
+                            {{ participante.beneficiaria.telefono }}
+                        </p>
+                    {% endif %}
+                    {% if participante.beneficiaria.edad %}
+                        <p class="text-muted">
+                            <i class="fas fa-birthday-cake me-1"></i>
+                            {{ participante.beneficiaria.edad }} años
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{% url 'beneficiaria_detail' participante.beneficiaria.id %}" class="btn btn-outline-info w-100">
+                        <i class="fas fa-eye me-1"></i>Ver perfil de beneficiaria
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

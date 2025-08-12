@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Usuarios - APRODMAYO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .user-card .card-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border-bottom: none;
+        position: relative;
+    }
+    
+    .user-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-avatar-text {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .user-role {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .role-admin {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .role-employee {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .permission-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.5rem;
+        background-color: var(--light-purple);
+        color: var(--primary-dark);
+    }
+    
+    .permission-tag.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    .user-actions {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .user-card:hover .user-actions {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1 class="mb-0"><i class="bi bi-people-fill me-2"></i>Gestión de Usuarios</h1>
+        <p class="text-muted">Administra los usuarios del sistema y sus permisos</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a href="{% url 'usuario_create' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus me-2"></i> Crear Nuevo Usuario
+        </a>
+    </div>
+</div>
+
+<!-- Filtro de búsqueda -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="search" class="form-label">Buscar</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="search" name="search" placeholder="Nombre, usuario o email" value="{{ request.GET.search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="role" class="form-label">Filtrar por rol</label>
+                <select class="form-select" id="role" name="role">
+                    <option value="">Todos los roles</option>
+                    <option value="administrador" {% if request.GET.role == 'administrador' %}selected{% endif %}>Administrador</option>
+                    <option value="empleado" {% if request.GET.role == 'empleado' %}selected{% endif %}>Empleado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Estado</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Todos</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Activos</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactivos</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    {% for usuario in usuarios %}
+    <div class="col">
+        <div class="card user-card h-100">
+            <div class="card-header">
+                <span class="user-role {% if usuario.is_admin %}role-admin{% else %}role-employee{% endif %}">
+                    {{ usuario.get_role_display }}
+                </span>
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar me-3">
+                        {% if usuario.imagen_perfil %}
+                        <img src="{{ usuario.imagen_perfil.url }}" alt="{{ usuario.username }}">
+                        {% else %}
+                        <span class="user-avatar-text">{{ usuario.username|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{{ usuario.get_full_name|default:usuario.username }}</h5>
+                        <small class="text-light">@{{ usuario.username }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Información de contacto:</small>
+                    <p class="mb-1"><i class="bi bi-envelope me-2"></i>{{ usuario.email|default:"No disponible" }}</p>
+                    <p class="mb-3"><i class="bi bi-telephone me-2"></i>{{ usuario.telefono|default:"No disponible" }}</p>
+                </div>
+                
+                <div>
+                    <small class="text-muted d-block mb-1">Permisos de módulos:</small>
+                    <div>
+                        <span class="permission-tag {% if usuario.permiso_beneficiarias or usuario.is_admin %}active{% endif %}">
+                            <i class="bi bi-people me-1"></i> Beneficiarias
+                        </span>
+                        
+                        <span class="permission-tag {% if usuario.permiso_finanzas or usuario.is_admin %}active{% endif %}">
+                            <i class="bi bi-cash-coin me-1"></i> Finanzas
+                        </span>
+                        
+                        <span class="permission-tag {% if usuario.permiso_talleres or usuario.is_admin %}active{% endif %}">
+                            <i class="bi bi-calendar-check me-1"></i> Talleres
+                        </span>
+                        
+                        <span class="permission-tag {% if usuario.permiso_reportes or usuario.is_admin %}active{% endif %}">
+                            <i class="bi bi-file-bar-graph me-1"></i> Reportes
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted d-block mb-1">Estado de la cuenta:</small>
+                    {% if usuario.is_active %}
+                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Activo</span>
+                    {% else %}
+                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Inactivo</span>
+                    {% endif %}
+                    
+                    <small class="d-block mt-2 text-muted">
+                        <i class="bi bi-clock-history me-1"></i> 
+                        Último acceso: {{ usuario.fecha_ultimo_acceso|date:"d/m/Y H:i"|default:"Nunca" }}
+                    </small>
+                </div>
+                
+                <div class="user-actions text-center">
+                    <div class="btn-group">
+                        <a href="{% url 'usuario_update' usuario.pk %}" class="btn btn-sm btn-light">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                        {% if not usuario.is_admin %}
+                        <a href="{% url 'usuario_delete' usuario.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash me-1"></i> Eliminar
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle-fill me-2"></i> No se encontraron usuarios con los criterios seleccionados.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Paginación -->
+{% if is_paginated %}
+<div class="mt-4">
+    <nav aria-label="Paginación de usuarios">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Primera">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" aria-label="Última">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

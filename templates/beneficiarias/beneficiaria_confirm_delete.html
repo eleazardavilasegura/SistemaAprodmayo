@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmar Eliminación - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Confirmar Eliminación</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <h4 class="mb-3">¿Estás seguro que deseas eliminar la siguiente beneficiaria?</h4>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ object.nombres }} {{ object.apellidos }}</h5>
+                            <p class="card-text mb-1"><strong>DNI:</strong> {{ object.documento_identidad }}</p>
+                            <p class="card-text mb-1"><strong>Teléfono:</strong> {{ object.telefono }}</p>
+                            <p class="card-text"><strong>Dirección:</strong> {{ object.direccion }}</p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-danger mb-4">
+                        Al eliminar esta beneficiaria, también se eliminarán todos los datos asociados, como acompañantes, 
+                        seguimientos, participación en talleres, entre otros.
+                    </p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'beneficiaria_detail' object.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-2"></i> Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

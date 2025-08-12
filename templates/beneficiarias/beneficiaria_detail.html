@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Beneficiaria - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'beneficiaria_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a la lista
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ beneficiaria.nombres }} {{ beneficiaria.apellidos }}</h2>
+        <div>
+            <a href="{% url 'beneficiaria_update' beneficiaria.pk %}" class="btn btn-light">Editar</a>
+            <a href="{% url 'beneficiaria_delete' beneficiaria.pk %}" class="btn btn-danger">Eliminar</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Información Personal</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Fecha de ingreso:</th>
+                        <td>{{ beneficiaria.fecha_ingreso|date:"d/m/Y" }} {{ beneficiaria.hora_ingreso|time:"H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Documento:</th>
+                        <td>{{ beneficiaria.get_tipo_documento_display }}: {{ beneficiaria.documento_identidad }}</td>
+                    </tr>
+                    <tr>
+                        <th>Edad:</th>
+                        <td>{{ beneficiaria.edad|default:'No registrada' }} años</td>
+                    </tr>
+                    <tr>
+                        <th>Fecha de nacimiento:</th>
+                        <td>{{ beneficiaria.fecha_nacimiento|date:"d/m/Y"|default:'No registrada' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Estado civil:</th>
+                        <td>{{ beneficiaria.get_estado_civil_display|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Teléfono:</th>
+                        <td>{{ beneficiaria.telefono|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Correo:</th>
+                        <td>{{ beneficiaria.correo|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Dirección:</th>
+                        <td>{{ beneficiaria.direccion|default:'No registrada' }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h4>Información Socioeconómica</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Nivel educativo:</th>
+                        <td>{{ beneficiaria.get_nivel_educativo_display|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ocupación:</th>
+                        <td>{{ beneficiaria.ocupacion|default:'No registrada' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Situación laboral:</th>
+                        <td>{{ beneficiaria.get_situacion_laboral_display|default:'No registrada' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Situación de vivienda:</th>
+                        <td>{{ beneficiaria.get_situacion_vivienda_display|default:'No registrada' }}</td>
+                    </tr>
+                </table>
+
+                <h4>Información del Caso</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Motivo de consulta:</th>
+                        <td>{{ beneficiaria.motivo_consulta|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tipo de violencia:</th>
+                        <td>{{ beneficiaria.get_tipo_violencia_display|default:'No registrado' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Descripción de la situación:</th>
+                        <td>{{ beneficiaria.descripcion_situacion|default:'No registrada' }}</td>
+                    </tr>
+                </table>
+                
+                <h4>Información Médica</h4>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Problemas de salud:</th>
+                        <td>{{ beneficiaria.problemas_salud|default:'No registrados' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Medicación:</th>
+                        <td>{{ beneficiaria.medicacion|default:'No registrada' }}</td>
+                    </tr>
+                </table>
+
+                {% if beneficiaria.tiene_hijos %}
+                <div class="alert alert-info">Tiene {{ beneficiaria.numero_hijos }} hijo(s)</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acompañantes -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Acompañantes</h3>
+        <a href="{% url 'acompanante_create' beneficiaria.pk %}" class="btn btn-light">Agregar acompañante</a>
+    </div>
+    <div class="card-body">
+        {% if acompanantes %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nombres y Apellidos</th>
+                            <th>Parentesco</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for acompanante in acompanantes %}
+                            <tr>
+                                <td>{{ acompanante.nombres }} {{ acompanante.apellidos }}</td>
+                                <td>{{ acompanante.get_parentesco_display }}</td>
+                                <td>{{ acompanante.telefono|default:'-' }}</td>
+                                <td>
+                                    <a href="{% url 'acompanante_update' acompanante.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'acompanante_delete' acompanante.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No hay acompañantes registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Hijos -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Hijos</h3>
+        <a href="{% url 'hijo_create' beneficiaria.pk %}" class="btn btn-light">Agregar hijo</a>
+    </div>
+    <div class="card-body">
+        {% if hijos %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nombres y Apellidos</th>
+                            <th>Edad</th>
+                            <th>Género</th>
+                            <th>Escolaridad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hijo in hijos %}
+                            <tr>
+                                <td>{{ hijo.nombres }} {{ hijo.apellidos }}</td>
+                                <td>{{ hijo.edad|default:'-' }}</td>
+                                <td>{{ hijo.get_genero_display }}</td>
+                                <td>{{ hijo.escolaridad|default:'-' }}</td>
+                                <td>
+                                    <a href="{% url 'hijo_update' hijo.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'hijo_delete' hijo.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No hay hijos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Seguimiento -->
+<div class="card mb-4">
+    <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">Seguimiento del Caso</h3>
+        <a href="{% url 'seguimiento_create' beneficiaria.pk %}" class="btn btn-light">Agregar seguimiento</a>
+    </div>
+    <div class="card-body">
+        {% if seguimientos %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tipo de atención</th>
+                            <th>Profesional</th>
+                            <th>Próxima cita</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for seguimiento in seguimientos %}
+                            <tr>
+                                <td>{{ seguimiento.fecha|date:"d/m/Y" }}</td>
+                                <td>{{ seguimiento.get_tipo_atencion_display }}</td>
+                                <td>{{ seguimiento.profesional }}</td>
+                                <td>{{ seguimiento.proxima_cita|date:"d/m/Y"|default:'-' }}</td>
+                                <td>
+                                    <a href="{% url 'seguimiento_update' seguimiento.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'seguimiento_delete' seguimiento.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No hay seguimientos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

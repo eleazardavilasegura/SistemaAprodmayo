@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Egresos - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{% if object %}Editar Egreso{% else %}Registro de Egreso{% endif %}</h2>
+        <a href="{% url 'egreso_list' %}" class="btn btn-light">Ver todos los egresos</a>
+    </div>
+    <div class="card-body">
+        <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha <span class="text-danger">*</span></label>
+                        {{ form.fecha }}
+                        {% if form.fecha.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.fecha.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.monto.id_for_label }}" class="form-label">Monto (S/.) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">S/.</span>
+                            {{ form.monto }}
+                            {% if form.monto.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.monto.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría <span class="text-danger">*</span></label>
+                        {{ form.categoria }}
+                        {% if form.categoria.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.categoria.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">
+                            <a href="{% url 'categoria_create' %}?tipo=EGRESO" target="_blank">+ Agregar nueva categoría</a>
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.proveedor.id_for_label }}" class="form-label">Proveedor</label>
+                        {{ form.proveedor }}
+                        {% if form.proveedor.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.proveedor.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción <span class="text-danger">*</span></label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.descripcion.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.comprobante.id_for_label }}" class="form-label">Número de Comprobante</label>
+                        {{ form.comprobante }}
+                        {% if form.comprobante.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.comprobante.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+                        {{ form.observaciones }}
+                        {% if form.observaciones.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.observaciones.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">
+                            Opcional. Ingrese cualquier información adicional relevante.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.registrado_por.id_for_label }}" class="form-label">Registrado Por</label>
+                        {{ form.registrado_por }}
+                        {% if form.registrado_por.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.registrado_por.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'egreso_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Actualizar{% else %}Registrar{% endif %} Egreso
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación del formulario
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %}

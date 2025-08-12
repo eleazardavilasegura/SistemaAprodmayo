@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load finanzas_filters %}
+
+{% block title %}Dashboard Financiero - APRODMAYO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-left: 4px solid;
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-card.income {
+        border-color: #28a745;
+    }
+    .stat-card.expense {
+        border-color: #dc3545;
+    }
+    .stat-card.balance {
+        border-color: #17a2b8;
+    }
+    .stat-card.members {
+        border-color: #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Dashboard Financiero</h2>
+        <a href="{% url 'informe_create' %}" class="btn btn-light">Generar Informe</a>
+    </div>
+    <div class="card-body">
+        <!-- Filtros de fecha -->
+        <form class="mb-4 row g-3 align-items-end" method="get">
+            <div class="col-md-4">
+                <label for="fecha_inicio" class="form-label">Fecha inicial</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" value="{{ fecha_inicio|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="fecha_fin" class="form-label">Fecha final</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" value="{{ fecha_fin|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Actualizar</button>
+            </div>
+        </form>
+        
+        <!-- Tarjetas de estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card income mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Ingresos</h5>
+                        <h3 class="text-success">{{ total_ingresos|money_format }}</h3>
+                        <small class="text-muted">Período seleccionado</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card expense mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Egresos</h5>
+                        <h3 class="text-danger">{{ total_egresos|money_format }}</h3>
+                        <small class="text-muted">Período seleccionado</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card balance mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Saldo</h5>
+                        <h3 class="{{ saldo|positive_class }}">{{ saldo|money_format }}</h3>
+                        <small class="text-muted">Ingresos - Egresos</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card members mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Socios</h5>
+                        <h3>{{ socios_activos }} <small class="text-muted">/ {{ total_socios }}</small></h3>
+                        <small class="text-muted">Activos / Total</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tendencia de Ingresos y Egresos (Como tabla) -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Tendencia de Ingresos y Egresos</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th class="text-end">Ingresos</th>
+                                <th class="text-end">Egresos</th>
+                                <th class="text-end">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in meses|length|get_range %}
+                            <tr>
+                                <td>{{ meses|get_item:i }}</td>
+                                <td class="text-end text-success">{{ datos_ingresos|get_item:i|floatformat:2|money_format }}</td>
+                                <td class="text-end text-danger">{{ datos_egresos|get_item:i|floatformat:2|money_format }}</td>
+                                <td class="text-end {% if datos_ingresos|get_item:i > datos_egresos|get_item:i %}text-success{% else %}text-danger{% endif %}">
+                                    {{ datos_ingresos|get_item:i|subtract:datos_egresos|get_item:i|floatformat:2|money_format }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Distribución de ingresos y egresos -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Distribución de Ingresos</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tabla de ingresos por categoría -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th class="text-end">Monto</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ingreso in ingresos_por_categoria %}
+                                    <tr>
+                                        <td>{{ ingreso.categoria__nombre }}</td>
+                                        <td class="text-end">{{ ingreso.total|money_format }}</td>
+                                        <td class="text-end">
+                                            {% if total_ingresos > 0 %}
+                                                {{ ingreso.total|percentage:total_ingresos }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="table-success">
+                                        <th>Total</th>
+                                        <th class="text-end">{{ total_ingresos|money_format }}</th>
+                                        <th class="text-end">100%</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Distribución de Egresos</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tabla de egresos por categoría -->
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th class="text-end">Monto</th>
+                                        <th class="text-end">%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for egreso in egresos_por_categoria %}
+                                    <tr>
+                                        <td>{{ egreso.categoria__nombre }}</td>
+                                        <td class="text-end">{{ egreso.total|money_format }}</td>
+                                        <td class="text-end">
+                                            {% if total_egresos > 0 %}
+                                                {{ egreso.total|percentage:total_egresos }}%
+                                            {% else %}
+                                                0%
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr class="table-danger">
+                                        <th>Total</th>
+                                        <th class="text-end">{{ total_egresos|money_format }}</th>
+                                        <th class="text-end">100%</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Socios atrasados -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">Socios con Pagos Atrasados</h5>
+            </div>
+            <div class="card-body">
+                {% if socios_atrasados %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Socio</th>
+                                    <th>Último Pago</th>
+                                    <th>Contacto</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in socios_atrasados %}
+                                <tr>
+                                    <td>{{ item.socio.nombres }} {{ item.socio.apellidos }}</td>
+                                    <td>
+                                        {% if item.ultima_fecha %}
+                                            {{ item.ultima_fecha|date:"d/m/Y" }}
+                                        {% else %}
+                                            <span class="badge bg-danger">Nunca</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.socio.telefono|default:"-" }}</td>
+                                    <td>
+                                        <a href="{% url 'socio_detail' item.socio.id %}" class="btn btn-sm btn-info">Ver</a>
+                                        <a href="{% url 'pago_socio_create' item.socio.id %}" class="btn btn-sm btn-success">Registrar Pago</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        No hay socios con pagos atrasados. ¡Todo está al día!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

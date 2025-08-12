@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado de Participación</title>
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+        .certificate-container {
+            width: 100%;
+            height: 100%;
+            padding: 50px;
+            box-sizing: border-box;
+            position: relative;
+            background-image: url('/static/images/pattern-bg.png');
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .watermark-text {
+            color: rgba(255, 0, 0, 0.15);
+            font-size: 120px;
+            font-weight: bold;
+            transform: rotate(-45deg);
+            white-space: nowrap;
+        }
+        .border {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid #8a6d3b;
+            box-sizing: border-box;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #8a6d3b;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .content {
+            text-align: center;
+            padding: 0 50px;
+        }
+        .presented-to {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #5a5a5a;
+        }
+        .participant-name {
+            font-size: 38px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+            padding: 10px 0;
+        }
+        .description {
+            font-size: 18px;
+            margin: 20px 0;
+            line-height: 1.6;
+            color: #444;
+        }
+        .course-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8a6d3b;
+            margin: 10px 0;
+        }
+        .date {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #5a5a5a;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 60px;
+            padding: 0 100px;
+        }
+        .signature {
+            text-align: center;
+        }
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #000;
+            margin: 10px auto;
+        }
+        .signature-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .signature-title {
+            font-size: 14px;
+            color: #5a5a5a;
+        }
+        .certificate-id {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        {% if not certificado_oficial %}
+        <div class="watermark">
+            <div class="watermark-text">NO OFICIAL</div>
+        </div>
+        {% endif %}
+        <div class="border"></div>
+        <div class="header">
+            <img src="{{ logo_url }}" alt="APRODMAYO Logo" class="logo">
+            <div class="title">Certificado de Participación</div>
+        </div>
+        <div class="content">
+            <div class="presented-to">Se certifica que</div>
+            <div class="participant-name">{{ participante.nombre_completo }}</div>
+            <div class="description">
+                Ha participado y completado satisfactoriamente el curso:
+            </div>
+            <div class="course-name">{{ taller.nombre }}</div>
+            <div class="description">
+                Con una duración de {{ duracion }} horas, realizado desde el 
+                {{ taller.fecha_inicio|date:"d 'de' F 'de' Y" }} hasta el 
+                {{ taller.fecha_fin|date:"d 'de' F 'de' Y" }}.
+            </div>
+            <div class="date">
+                Ayacucho, {{ fecha_emision|date:"d 'de' F 'de' Y" }}
+            </div>
+        </div>
+        <div class="footer">
+            <div class="signature">
+                <div class="signature-line"></div>
+                <div class="signature-name">{{ taller.facilitador }}</div>
+                <div class="signature-title">Facilitador/a</div>
+            </div>
+            <div class="signature">
+                <div class="signature-line"></div>
+                <div class="signature-name">Dra. María E. López R.</div>
+                <div class="signature-title">Directora Ejecutiva de APRODMAYO</div>
+            </div>
+        </div>
+        <div class="certificate-id">Certificado #{{ certificado_id }}</div>
+    </div>
+</body>
+</html>

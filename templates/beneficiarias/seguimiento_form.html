@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Seguimiento - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="bi bi-journal-text"></i> {% if form.instance.pk %}Editar{% else %}Nuevo{% endif %} Seguimiento de Caso</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.fecha.id_for_label }}" class="form-label">Fecha *</label>
+                        {{ form.fecha }}
+                        {% if form.fecha.errors %}
+                            <div class="text-danger">
+                                {% for error in form.fecha.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.tipo_atencion.id_for_label }}" class="form-label">Tipo de Atención *</label>
+                        {{ form.tipo_atencion }}
+                        {% if form.tipo_atencion.errors %}
+                            <div class="text-danger">
+                                {% for error in form.tipo_atencion.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.profesional.id_for_label }}" class="form-label">Profesional</label>
+                        {{ form.profesional }}
+                        {% if form.profesional.errors %}
+                            <div class="text-danger">
+                                {% for error in form.profesional.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción de la atención *</label>
+                {{ form.descripcion }}
+                {% if form.descripcion.errors %}
+                    <div class="text-danger">
+                        {% for error in form.descripcion.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.acuerdos.id_for_label }}" class="form-label">Acuerdos y compromisos</label>
+                {{ form.acuerdos }}
+                {% if form.acuerdos.errors %}
+                    <div class="text-danger">
+                        {% for error in form.acuerdos.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.proxima_cita.id_for_label }}" class="form-label">Próxima cita</label>
+                {{ form.proxima_cita }}
+                {% if form.proxima_cita.errors %}
+                    <div class="text-danger">
+                        {% for error in form.proxima_cita.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="mt-4 d-flex justify-content-between">
+                {% if form.instance.pk %}
+                    <a href="{% url 'beneficiaria_detail' form.instance.beneficiaria.pk %}" class="btn btn-secondary">Cancelar</a>
+                {% else %}
+                    <a href="{% url 'beneficiaria_detail' view.kwargs.pk %}" class="btn btn-secondary">Cancelar</a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

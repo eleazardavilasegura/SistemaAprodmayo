@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if beneficiaria %}
+        Editar Beneficiaria - APRODMAYO
+    {% else %}
+        Nueva Beneficiaria - APRODMAYO
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para mejorar la visualización del formulario */
+    .form-section {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .section-title {
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+    
+    /* Destaque para campos requeridos */
+    .required-field::after {
+        content: " *";
+        color: red;
+        font-weight: bold;
+    }
+    
+    /* Mejora visual para los campos de texto largo */
+    textarea.form-control {
+        min-height: 80px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% if beneficiaria %}{% url 'beneficiaria_detail' beneficiaria.pk %}{% else %}{% url 'beneficiaria_list' %}{% endif %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">
+            {% if beneficiaria %}
+                Editar Beneficiaria
+            {% else %}
+                Registrar Nueva Beneficiaria
+            {% endif %}
+        </h2>
+    </div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-12">
+                    <h4>Información de Recepción</h4>
+                    <hr>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.fecha_ingreso.id_for_label }}" class="form-label">Fecha de ingreso</label>
+                    {{ form.fecha_ingreso }}
+                    {% if form.fecha_ingreso.errors %}
+                        <div class="text-danger">
+                            {{ form.fecha_ingreso.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.hora_ingreso.id_for_label }}" class="form-label">Hora de ingreso</label>
+                    {{ form.hora_ingreso }}
+                    {% if form.hora_ingreso.errors %}
+                        <div class="text-danger">
+                            {{ form.hora_ingreso.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.recibido_por.id_for_label }}" class="form-label">Recibido por</label>
+                    {{ form.recibido_por }}
+                    {% if form.recibido_por.errors %}
+                        <div class="text-danger">
+                            {{ form.recibido_por.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Información Personal</h4>
+                    <hr>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.nombres.id_for_label }}" class="form-label">Nombres *</label>
+                    {{ form.nombres }}
+                    {% if form.nombres.errors %}
+                        <div class="text-danger">
+                            {{ form.nombres.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.apellidos.id_for_label }}" class="form-label">Apellidos *</label>
+                    {{ form.apellidos }}
+                    {% if form.apellidos.errors %}
+                        <div class="text-danger">
+                            {{ form.apellidos.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.edad.id_for_label }}" class="form-label">Edad</label>
+                    {{ form.edad }}
+                    {% if form.edad.errors %}
+                        <div class="text-danger">
+                            {{ form.edad.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de nacimiento</label>
+                    {{ form.fecha_nacimiento }}
+                    {% if form.fecha_nacimiento.errors %}
+                        <div class="text-danger">
+                            {{ form.fecha_nacimiento.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.tipo_documento.id_for_label }}" class="form-label">Tipo de documento</label>
+                    {{ form.tipo_documento }}
+                    {% if form.tipo_documento.errors %}
+                        <div class="text-danger">
+                            {{ form.tipo_documento.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.documento_identidad.id_for_label }}" class="form-label">Documento de identidad</label>
+                    {{ form.documento_identidad }}
+                    {% if form.documento_identidad.errors %}
+                        <div class="text-danger">
+                            {{ form.documento_identidad.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                    {{ form.direccion }}
+                    {% if form.direccion.errors %}
+                        <div class="text-danger">
+                            {{ form.direccion.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                    {{ form.telefono }}
+                    {% if form.telefono.errors %}
+                        <div class="text-danger">
+                            {{ form.telefono.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.correo.id_for_label }}" class="form-label">Correo electrónico</label>
+                    {{ form.correo }}
+                    {% if form.correo.errors %}
+                        <div class="text-danger">
+                            {{ form.correo.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="{{ form.estado_civil.id_for_label }}" class="form-label">Estado civil</label>
+                    {{ form.estado_civil }}
+                    {% if form.estado_civil.errors %}
+                        <div class="text-danger">
+                            {{ form.estado_civil.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Información Socioeconómica</h4>
+                    <hr>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.nivel_educativo.id_for_label }}" class="form-label">Nivel educativo</label>
+                    {{ form.nivel_educativo }}
+                    {% if form.nivel_educativo.errors %}
+                        <div class="text-danger">
+                            {{ form.nivel_educativo.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.ocupacion.id_for_label }}" class="form-label">Ocupación</label>
+                    {{ form.ocupacion }}
+                    {% if form.ocupacion.errors %}
+                        <div class="text-danger">
+                            {{ form.ocupacion.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.situacion_laboral.id_for_label }}" class="form-label">Situación laboral</label>
+                    {{ form.situacion_laboral }}
+                    {% if form.situacion_laboral.errors %}
+                        <div class="text-danger">
+                            {{ form.situacion_laboral.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.situacion_vivienda.id_for_label }}" class="form-label">Situación de vivienda</label>
+                    {{ form.situacion_vivienda }}
+                    {% if form.situacion_vivienda.errors %}
+                        <div class="text-danger">
+                            {{ form.situacion_vivienda.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Información del Caso</h4>
+                    <hr>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="{{ form.motivo_consulta.id_for_label }}" class="form-label">Motivo de consulta</label>
+                    {{ form.motivo_consulta }}
+                    {% if form.motivo_consulta.errors %}
+                        <div class="text-danger">
+                            {{ form.motivo_consulta.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.tipo_violencia.id_for_label }}" class="form-label">Tipo de violencia</label>
+                    {{ form.tipo_violencia }}
+                    {% if form.tipo_violencia.errors %}
+                        <div class="text-danger">
+                            {{ form.tipo_violencia.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="{{ form.descripcion_situacion.id_for_label }}" class="form-label">Descripción de la situación</label>
+                    {{ form.descripcion_situacion }}
+                    {% if form.descripcion_situacion.errors %}
+                        <div class="text-danger">
+                            {{ form.descripcion_situacion.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Información Médica</h4>
+                    <hr>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.problemas_salud.id_for_label }}" class="form-label">Problemas de salud</label>
+                    {{ form.problemas_salud }}
+                    {% if form.problemas_salud.errors %}
+                        <div class="text-danger">
+                            {{ form.problemas_salud.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.medicacion.id_for_label }}" class="form-label">Medicación</label>
+                    {{ form.medicacion }}
+                    {% if form.medicacion.errors %}
+                        <div class="text-danger">
+                            {{ form.medicacion.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Información Familiar</h4>
+                    <hr>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-check">
+                        {{ form.tiene_hijos }}
+                        <label for="{{ form.tiene_hijos.id_for_label }}" class="form-check-label">Tiene hijos</label>
+                        {% if form.tiene_hijos.errors %}
+                            <div class="text-danger">
+                                {{ form.tiene_hijos.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.numero_hijos.id_for_label }}" class="form-label">Número de hijos</label>
+                    {{ form.numero_hijos }}
+                    {% if form.numero_hijos.errors %}
+                        <div class="text-danger">
+                            {{ form.numero_hijos.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h4>Seguimiento</h4>
+                    <hr>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-check">
+                        {{ form.seguimiento_requerido }}
+                        <label for="{{ form.seguimiento_requerido.id_for_label }}" class="form-check-label">Requiere seguimiento</label>
+                        {% if form.seguimiento_requerido.errors %}
+                            <div class="text-danger">
+                                {{ form.seguimiento_requerido.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label for="{{ form.notas_seguimiento.id_for_label }}" class="form-label">Notas de seguimiento</label>
+                    {{ form.notas_seguimiento }}
+                    {% if form.notas_seguimiento.errors %}
+                        <div class="text-danger">
+                            {{ form.notas_seguimiento.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="{% if beneficiaria %}{% url 'beneficiaria_detail' beneficiaria.pk %}{% else %}{% url 'beneficiaria_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /**
+     * Función que se ejecuta cuando el documento HTML ha sido completamente cargado
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencias a elementos del DOM
+        const form = document.querySelector('form');
+        const tieneHijos = document.getElementById('{{ form.tiene_hijos.id_for_label }}');
+        const numeroHijos = document.getElementById('{{ form.numero_hijos.id_for_label }}').parentElement;
+        const requiereSeguimiento = document.getElementById('{{ form.seguimiento_requerido.id_for_label }}');
+        const notasSeguimiento = document.getElementById('{{ form.notas_seguimiento.id_for_label }}').parentElement;
+        
+        /**
+         * Muestra u oculta el campo de número de hijos según el checkbox
+         */
+        function toggleHijosField() {
+            if (tieneHijos.checked) {
+                numeroHijos.style.display = 'block';
+                document.getElementById('{{ form.numero_hijos.id_for_label }}').setAttribute('required', 'required');
+            } else {
+                numeroHijos.style.display = 'none';
+                document.getElementById('{{ form.numero_hijos.id_for_label }}').removeAttribute('required');
+                document.getElementById('{{ form.numero_hijos.id_for_label }}').value = '0';
+            }
+        }
+        
+        /**
+         * Muestra u oculta el campo de notas de seguimiento según el checkbox
+         */
+        function toggleSeguimientoField() {
+            if (requiereSeguimiento.checked) {
+                notasSeguimiento.style.display = 'block';
+            } else {
+                notasSeguimiento.style.display = 'none';
+                document.getElementById('{{ form.notas_seguimiento.id_for_label }}').value = '';
+            }
+        }
+        
+        /**
+         * Valida el formulario antes de enviar
+         */
+        function validateForm(event) {
+            let isValid = true;
+            const requiredFields = ['{{ form.nombres.id_for_label }}', '{{ form.apellidos.id_for_label }}'];
+            
+            // Validar campos requeridos
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Validar número de hijos si tiene hijos está marcado
+            if (tieneHijos.checked) {
+                const numeroHijosField = document.getElementById('{{ form.numero_hijos.id_for_label }}');
+                if (!numeroHijosField.value || parseInt(numeroHijosField.value) < 1) {
+                    numeroHijosField.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    numeroHijosField.classList.remove('is-invalid');
+                }
+            }
+            
+            if (!isValid) {
+                event.preventDefault();
+                // Mostrar mensaje de error
+                alert('Por favor, complete todos los campos requeridos marcados con *');
+            }
+        }
+        
+        // Asignar event listeners
+        tieneHijos.addEventListener('change', toggleHijosField);
+        requiereSeguimiento.addEventListener('change', toggleSeguimientoField);
+        form.addEventListener('submit', validateForm);
+        
+        // Inicializar estados
+        toggleHijosField();
+        toggleSeguimientoField();
+        
+        // Añadir asterisco a campos requeridos
+        document.querySelectorAll('label[for="{{ form.nombres.id_for_label }}"], label[for="{{ form.apellidos.id_for_label }}"]').forEach(label => {
+            label.classList.add('required-field');
+        });
+        
+        // Formato para DNI/documentos (como ejemplo - requeriría una biblioteca como cleave.js para una implementación completa)
+        const documentoField = document.getElementById('{{ form.documento_identidad.id_for_label }}');
+        documentoField.addEventListener('input', function(e) {
+            // Limitar a 8 dígitos para DNI peruano
+            if (document.getElementById('{{ form.tipo_documento.id_for_label }}').value === 'DNI') {
+                this.value = this.value.replace(/\D/g, '').substring(0, 8);
+            }
+        });
+    });
+</script>
+{% endblock %}

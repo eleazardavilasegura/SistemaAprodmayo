@@ -1,0 +1,155 @@
+{% extends "reportes/pdf_base.html" %}
+{% load static %}
+
+{% block report_title %}Balance Financiero{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <div class="report-header">
+        <h3>Resumen Financiero</h3>
+        <p>Fecha de generación: {{ fecha_generacion }}</p>
+        <p>Periodo: {{ fecha_inicio|date:"d/m/Y" }} - {{ fecha_fin|date:"d/m/Y" }}</p>
+    </div>
+    
+    <div class="report-summary">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Total Ingresos</h5>
+                        <p class="amount positive">S/ {{ total_ingresos|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Total Egresos</h5>
+                        <p class="amount negative">S/ {{ total_egresos|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Balance</h5>
+                        <p class="amount {% if balance >= 0 %}positive{% else %}negative{% endif %}">
+                            S/ {{ balance|floatformat:2 }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="report-section">
+        <h4>Detalle de Ingresos</h4>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Socio</th>
+                    <th>Monto (S/)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingreso in ingresos %}
+                <tr>
+                    <td>{{ ingreso.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ ingreso.descripcion }}</td>
+                    <td>{{ ingreso.categoria.nombre }}</td>
+                    <td>{{ ingreso.socio.nombre|default:"-" }}</td>
+                    <td class="text-right">{{ ingreso.monto|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="4" class="text-right"><strong>Total Ingresos:</strong></td>
+                    <td class="text-right"><strong>{{ total_ingresos|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="report-section">
+        <h4>Detalle de Egresos</h4>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Beneficiaria</th>
+                    <th>Monto (S/)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for egreso in egresos %}
+                <tr>
+                    <td>{{ egreso.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ egreso.descripcion }}</td>
+                    <td>{{ egreso.categoria.nombre }}</td>
+                    <td>{{ egreso.beneficiaria.nombres|default:"-" }} {{ egreso.beneficiaria.apellidos|default:"" }}</td>
+                    <td class="text-right">{{ egreso.monto|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="4" class="text-right"><strong>Total Egresos:</strong></td>
+                    <td class="text-right"><strong>{{ total_egresos|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if ingresos_por_categoria or egresos_por_categoria %}
+    <div class="report-section">
+        <h4>Resumen por Categorías</h4>
+        
+        {% if ingresos_por_categoria %}
+        <h5>Ingresos por Categoría</h5>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Categoría</th>
+                    <th>Monto Total (S/)</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in ingresos_por_categoria %}
+                <tr>
+                    <td>{{ categoria.categoria__nombre }}</td>
+                    <td class="text-right">{{ categoria.total|floatformat:2 }}</td>
+                    <td class="text-right">{{ categoria.porcentaje|floatformat:1 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        
+        {% if egresos_por_categoria %}
+        <h5>Egresos por Categoría</h5>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Categoría</th>
+                    <th>Monto Total (S/)</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in egresos_por_categoria %}
+                <tr>
+                    <td>{{ categoria.categoria__nombre }}</td>
+                    <td class="text-right">{{ categoria.total|floatformat:2 }}</td>
+                    <td class="text-right">{{ categoria.porcentaje|floatformat:1 }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

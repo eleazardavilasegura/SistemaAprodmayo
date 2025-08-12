@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Beneficiarias - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Registro de Beneficiarias</h2>
+        <a href="{% url 'beneficiaria_create' %}" class="btn btn-light">Nueva Beneficiaria</a>
+    </div>
+    <div class="card-body">
+        <form class="mb-4" method="get" action="{% url 'beneficiaria_list' %}">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre, apellido o documento..." value="{{ request.GET.q|default:'' }}">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </div>
+        </form>
+        
+        {% if beneficiarias %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombres y Apellidos</th>
+                            <th>Documento</th>
+                            <th>Fecha de Ingreso</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for beneficiaria in beneficiarias %}
+                            <tr>
+                                <td>{{ beneficiaria.nombres }} {{ beneficiaria.apellidos }}</td>
+                                <td>{{ beneficiaria.documento_identidad }}</td>
+                                <td>{{ beneficiaria.fecha_ingreso|date:"d/m/Y" }}</td>
+                                <td>{{ beneficiaria.telefono|default:'-' }}</td>
+                                <td>
+                                    <a href="{% url 'beneficiaria_detail' beneficiaria.pk %}" class="btn btn-sm btn-info">Ver</a>
+                                    <a href="{% url 'beneficiaria_update' beneficiaria.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'beneficiaria_delete' beneficiaria.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if is_paginated %}
+                <nav aria-label="Paginación">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">&laquo; Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Anterior</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">&laquo; Primera</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">{{ i }}</a>
+                                </li>
+                            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Última &raquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Siguiente</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Última &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                No se encontraron beneficiarias registradas.
+                {% if request.GET.q %}
+                    <a href="{% url 'beneficiaria_list' %}" class="alert-link">Ver todas las beneficiarias</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

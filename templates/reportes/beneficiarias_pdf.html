@@ -1,0 +1,205 @@
+{% extends "reportes/pdf_base.html" %}
+{% load static %}
+
+{% block report_title %}Reporte de Beneficiarias{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <div class="report-header">
+        <h3>Listado de Beneficiarias</h3>
+        <p>Total de beneficiarias: {{ beneficiarias_con_datos|length }}</p>
+    </div>
+    
+    <div class="report-body">
+        <!-- Tabla principal de beneficiarias -->
+        <table style="width: 100%; border: 1px solid #333;">
+            <colgroup>
+                <col style="width: 5%">  <!-- ID ajustado para mejor estética -->
+                <col style="width: 30%"> <!-- Nombre Completo (más equilibrado) -->
+                <col style="width: 15%"> <!-- Documento -->
+                <col style="width: 35%"> <!-- Dirección (equilibrada) -->
+                <col style="width: 15%">  <!-- Teléfono (aumentado para 9 dígitos) -->
+            </colgroup>
+            <thead class="thead-light">
+                <tr>
+                    <th style="width: 5%;">ID</th>
+                    <th style="width: 30%;">Nombre Completo</th>
+                    <th style="width: 15%;">Documento</th>
+                    <th style="width: 35%;">Dirección</th>
+                    <th style="width: 15%;">Teléfono</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in beneficiarias_con_datos %}
+                <tr>
+                    <td style="width: 5%;">{{ item.beneficiaria.id }}</td>
+                    <td class="text-wrap" style="width: 30%;">{{ item.beneficiaria.nombres }} {{ item.beneficiaria.apellidos }}</td>
+                    <td style="width: 15%;">{{ item.beneficiaria.documento_identidad }}</td>
+                    <td class="text-wrap" style="width: 35%;">{{ item.beneficiaria.direccion|truncatechars:35 }}</td>
+                    <td style="width: 15%;">{{ item.beneficiaria.telefono }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3 style="margin-top: 20px;">Información Detallada por Beneficiaria</h3>
+        
+        {% for item in beneficiarias_con_datos %}
+            <div class="report-section" style="margin-top: 20px; padding-top: 8px; border-top: 1px dashed #ccc; page-break-inside: avoid;">
+                <h4 style="color: #702c8c; border-bottom: 1px solid #ddd; padding-bottom: 3px; font-size: 11px;">
+                    {{ item.beneficiaria.nombres }} {{ item.beneficiaria.apellidos }}
+                </h4>
+                
+                <!-- Acompañantes -->
+                {% if item.acompanantes %}
+                    <div style="margin-top: 6px; margin-bottom: 0;">
+                        <h5 style="font-size: 9px; margin-bottom: 2px; color: #493240;">Acompañantes:</h5>
+                        <!-- Tabla de acompañantes -->
+                        <table class="small-table" style="margin-bottom: 8px; width: 100%; border: 1px solid #333;">
+                            <colgroup>
+                                <col style="width: 45%"> <!-- Nombre (más equilibrado) -->
+                                <col style="width: 18%"> <!-- Parentesco (aumentado) -->
+                                <col style="width: 15%">  <!-- Teléfono (aumentado para 9 dígitos) -->
+                                <col style="width: 22%"> <!-- Documento -->
+                            </colgroup>
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 45%;">Nombre</th>
+                                    <th style="width: 18%;">Parentesco</th>
+                                    <th style="width: 15%;">Teléfono</th>
+                                    <th style="width: 22%;">Documento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for acompanante in item.acompanantes %}
+                                <tr>
+                                    <td class="text-wrap" style="width: 45%;">{{ acompanante.nombres }} {{ acompanante.apellidos|truncatechars:20 }}</td>
+                                    <td style="width: 18%;">{{ acompanante.get_parentesco_display }}</td>
+                                    <td style="width: 15%;">{{ acompanante.telefono }}</td>
+                                    <td style="width: 22%;">{{ acompanante.documento_identidad }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                
+                <!-- Evaluaciones de talleres -->
+                {% if item.diagnosticos %}
+                    <div style="margin-top: 10px;">
+                        <h5 style="font-size: 10px; margin-bottom: 4px; color: #493240;">Evaluaciones de Talleres:</h5>
+                        <!-- Tabla de evaluaciones -->
+                        <table style="margin-bottom: 10px; width: 100%;">
+                            <colgroup>
+                                <col style="width: 10%"> <!-- Fecha -->
+                                <col style="width: 22%"> <!-- Título -->
+                                <col style="width: 15%"> <!-- Nivel de Logro -->
+                                <col style="width: 15%"> <!-- Evaluador -->
+                                <col style="width: 38%"> <!-- Descripción -->
+                            </colgroup>
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Título</th>
+                                    <th>Nivel de Logro</th>
+                                    <th>Evaluador</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evaluacion in item.diagnosticos %}
+                                <tr>
+                                    <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                                    <td class="text-wrap">{{ evaluacion.titulo|truncatechars:25 }}</td>
+                                    <td>
+                                        {% if evaluacion.nivel_logro == 'EXCELENTE' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #28a745; color: white;">{{ evaluacion.get_nivel_logro_display }}</span>
+                                        {% elif evaluacion.nivel_logro == 'BUENO' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #17a2b8; color: white;">{{ evaluacion.get_nivel_logro_display }}</span>
+                                        {% elif evaluacion.nivel_logro == 'REGULAR' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #ffc107; color: #212529;">{{ evaluacion.get_nivel_logro_display }}</span>
+                                        {% elif evaluacion.nivel_logro == 'NECESITA_MEJORAR' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #dc3545; color: white;">{{ evaluacion.get_nivel_logro_display }}</span>
+                                        {% else %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #6c757d; color: white;">{{ evaluacion.get_nivel_logro_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-wrap">{{ evaluacion.evaluador|truncatechars:15 }}</td>
+                                    <td class="text-wrap">{{ evaluacion.descripcion|truncatechars:50 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <!-- Detalles completos de evaluaciones con comentarios -->
+                        {% for evaluacion in item.diagnosticos %}
+                            {% if evaluacion.comentarios %}
+                                <div style="margin-top: 4px; margin-bottom: 4px; padding: 2px 4px; background-color: #f8f9fa; border-left: 2px solid #17a2b8; font-size: 7px; max-width: 100%; overflow: hidden;">
+                                    <p style="margin: 1px 0"><strong>Comentarios ({{ evaluacion.fecha|date:"d/m/Y" }} - {{ evaluacion.titulo|truncatechars:30 }}):</strong> {{ evaluacion.comentarios|truncatechars:100 }}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Seguimientos -->
+                {% if item.seguimientos %}
+                    <div style="margin-top: 10px;">
+                        <h5 style="font-size: 10px; margin-bottom: 4px; color: #493240;">Seguimientos de Caso:</h5>
+                        <table style="margin-bottom: 10px; width: 100%;">
+                            <colgroup>
+                                <col style="width: 10%"> <!-- Fecha -->
+                                <col style="width: 18%"> <!-- Tipo de Atención -->
+                                <col style="width: 15%"> <!-- Profesional -->
+                                <col style="width: 47%"> <!-- Descripción -->
+                                <col style="width: 10%"> <!-- Próxima Cita -->
+                            </colgroup>
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo de Atención</th>
+                                    <th>Profesional</th>
+                                    <th>Descripción</th>
+                                    <th>Próxima Cita</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for seguimiento in item.seguimientos %}
+                                <tr>
+                                    <td>{{ seguimiento.fecha|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if seguimiento.tipo_atencion == 'PSICOLOGICA' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #9c27b0; color: white;">{{ seguimiento.get_tipo_atencion_display }}</span>
+                                        {% elif seguimiento.tipo_atencion == 'LEGAL' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #2196f3; color: white;">{{ seguimiento.get_tipo_atencion_display }}</span>
+                                        {% elif seguimiento.tipo_atencion == 'SOCIAL' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #4caf50; color: white;">{{ seguimiento.get_tipo_atencion_display }}</span>
+                                        {% elif seguimiento.tipo_atencion == 'MEDICA' %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #f44336; color: white;">{{ seguimiento.get_tipo_atencion_display }}</span>
+                                        {% else %}
+                                            <span style="font-size: 7px; padding: 1px 3px; border-radius: 3px; background-color: #607d8b; color: white;">{{ seguimiento.get_tipo_atencion_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-wrap">{{ seguimiento.profesional|truncatechars:15 }}</td>
+                                    <td class="text-wrap">{{ seguimiento.descripcion|truncatechars:50 }}</td>
+                                    <td>{% if seguimiento.proxima_cita %}{{ seguimiento.proxima_cita|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <!-- Acuerdos importantes de seguimientos -->
+                        {% for seguimiento in item.seguimientos %}
+                            {% if seguimiento.acuerdos %}
+                                <div style="margin-top: 4px; margin-bottom: 4px; padding: 2px 4px; background-color: #f8f9fa; border-left: 2px solid #2196f3; font-size: 7px; max-width: 100%; overflow: hidden;">
+                                    <p style="margin: 1px 0"><strong>Acuerdos ({{ seguimiento.fecha|date:"d/m/Y" }}):</strong> {{ seguimiento.acuerdos|truncatechars:100 }}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

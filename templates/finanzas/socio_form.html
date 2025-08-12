@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load form_utils %}
+
+{% block title %}{% if object %}Editar{% else %}Registrar{% endif %} Socio - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{% if object %}Editar{% else %}Registrar{% endif %} Socio</h2>
+        <a href="{% url 'socio_list' %}" class="btn btn-light">Ver todos los socios</a>
+    </div>
+    <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Información personal -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Información Personal</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.documento_identidad.id_for_label }}" class="form-label">DNI <span class="text-danger">*</span></label>
+                                {{ form.documento_identidad|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.documento_identidad.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.documento_identidad.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.fecha_registro.id_for_label }}" class="form-label">Fecha de Registro <span class="text-danger">*</span></label>
+                                {{ form.fecha_registro|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.fecha_registro.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.fecha_registro.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.nombres.id_for_label }}" class="form-label">Nombres <span class="text-danger">*</span></label>
+                                {{ form.nombres|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.nombres.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.nombres.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.apellidos.id_for_label }}" class="form-label">Apellidos <span class="text-danger">*</span></label>
+                                {{ form.apellidos|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.apellidos.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.apellidos.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                                {{ form.telefono|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.telefono.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.telefono.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.estado.id_for_label }}" class="form-label">Estado <span class="text-danger">*</span></label>
+                                {{ form.estado|add_class:"form-select"|add_error_class:"is-invalid" }}
+                                {% if form.estado.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.estado.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección</label>
+                                {{ form.direccion|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.direccion.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.direccion.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.correo.id_for_label }}" class="form-label">Correo electrónico</label>
+                                {{ form.correo|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.correo.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.correo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.cuota_mensual.id_for_label }}" class="form-label">Cuota mensual <span class="text-danger">*</span></label>
+                                {{ form.cuota_mensual|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.cuota_mensual.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.cuota_mensual.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.observaciones.id_for_label }}" class="form-label">Observaciones</label>
+                                {{ form.observaciones|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if form.observaciones.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.observaciones.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'socio_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Actualizar{% else %}Registrar{% endif %} Socio
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación del formulario
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Validación de DNI (8 dígitos)
+        const dniInput = document.getElementById('{{ form.documento_identidad.id_for_label }}');
+        
+        dniInput.addEventListener('input', function() {
+            // Eliminar caracteres no numéricos
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Limitar a 8 dígitos
+            if (this.value.length > 8) {
+                this.value = this.value.slice(0, 8);
+            }
+        });
+    });
+</script>
+{% endblock %}

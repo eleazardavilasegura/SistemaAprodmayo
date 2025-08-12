@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load finanzas_filters %}
+
+{% block title %}Detalle de Socio - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Detalle del Socio</h2>
+        <div>
+            <a href="{% url 'pago_socio_create' object.id %}" class="btn btn-success me-2">
+                <i class="bi bi-cash"></i> Registrar Pago
+            </a>
+            <a href="{% url 'socio_list' %}" class="btn btn-light">
+                Volver a la lista
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Información personal -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Información Personal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">DNI</p>
+                                <p class="fw-bold">{{ object.dni }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">Nombres</p>
+                                <p class="fw-bold">{{ object.nombres }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">Apellidos</p>
+                                <p class="fw-bold">{{ object.apellidos }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">Fecha de Registro</p>
+                                <p class="fw-bold">{{ object.fecha_registro|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">Teléfono</p>
+                                <p class="fw-bold">{{ object.telefono|default:"No registrado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1 text-muted">Dirección</p>
+                                <p class="fw-bold">{{ object.direccion|default:"No registrada" }}</p>
+                            </div>
+                            <div class="col-md-3">
+                                <p class="mb-1 text-muted">Estado</p>
+                                <p>
+                                    <span class="badge {% if object.estado == 'ACTIVO' %}bg-success{% else %}bg-secondary{% endif %} fs-6">
+                                        {{ object.get_estado_display }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if object.notas %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <p class="mb-1 text-muted">Notas</p>
+                                    <p>{{ object.notas }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mt-3 d-flex justify-content-end">
+                            <a href="{% url 'socio_update' object.id %}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Editar información
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de pagos -->
+        <div class="card mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Historial de Pagos</h5>
+                <span class="badge {% if esta_al_dia %}bg-success{% else %}bg-danger{% endif %} fs-6">
+                    {% if esta_al_dia %}Al día{% else %}Con atrasos{% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                {% if pagos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Monto</th>
+                                    <th>Periodo</th>
+                                    <th>Comprobante</th>
+                                    <th>Observaciones</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pago in pagos %}
+                                    <tr>
+                                        <td>{{ pago.fecha|date:"d/m/Y" }}</td>
+                                        <td>S/ {{ pago.monto }}</td>
+                                        <td>{{ pago.periodo_mes|nombre_mes }} {{ pago.periodo_anio }}</td>
+                                        <td><strong>№ {{ pago.comprobante|default:"-" }}</strong></td>
+                                        <td>{{ pago.observaciones|default:"-" }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'pago_socio_update' pago.id %}" class="btn btn-warning" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'pago_socio_delete' pago.id %}" class="btn btn-danger" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        {% if dias_desde_registro <= 40 %}
+                            <strong>Este socio no tiene pagos registrados.</strong><br>
+                            El socio se registró hace {{ dias_desde_registro }} días y tiene hasta el 
+                            {{ object.fecha_registro|date:"d/m/Y"|add_days:40 }} para realizar el primer pago 
+                            (40 días desde su registro).
+                        {% else %}
+                            <strong>Este socio no tiene pagos registrados y ha superado el período de gracia.</strong><br>
+                            El socio se registró hace {{ dias_desde_registro }} días y debería haber realizado 
+                            al menos un pago. La fecha límite para el primer pago era el 
+                            {{ object.fecha_registro|date:"d/m/Y"|add_days:40 }}.
+                        {% endif %}
+                    </div>
+                {% endif %}
+                
+                <div class="mt-3 d-flex justify-content-end">
+                    <a href="{% url 'pago_socio_create' object.id %}" class="btn btn-success">
+                        <i class="bi bi-cash"></i> Registrar nuevo pago
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ingresos relacionados -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Ingresos Relacionados</h5>
+            </div>
+            <div class="card-body">
+                {% if ingresos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Categoría</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                    <th>Es Cuota</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ingreso in ingresos %}
+                                    <tr>
+                                        <td>{{ ingreso.fecha|date:"d/m/Y" }}</td>
+                                        <td>{{ ingreso.categoria.nombre }}</td>
+                                        <td>{{ ingreso.descripcion }}</td>
+                                        <td>S/ {{ ingreso.monto }}</td>
+                                        <td>
+                                            {% if ingreso.es_pago_socio %}
+                                                <span class="badge bg-success">Sí</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        No hay ingresos registrados para este socio.
+                    </div>
+                {% endif %}
+                
+                <div class="mt-3 d-flex justify-content-end">
+                    <a href="{% url 'ingreso_create' %}?socio={{ object.id }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Registrar ingreso
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Reporte de Talleres - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0"><i class="bi bi-calendar-check"></i> Reporte de Talleres</h2>
+        <div>
+            <a href="{% url 'reporte_talleres' %}?formato=pdf" class="btn btn-light btn-sm ms-2">
+                <i class="bi bi-file-pdf"></i> Exportar a PDF
+            </a>
+            <a href="{% url 'reporte_talleres' %}?formato=excel" class="btn btn-light btn-sm ms-2">
+                <i class="bi bi-file-excel"></i> Exportar a Excel
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h4>Reporte generado el {{ hoy|date:"d/m/Y" }}</h4>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Resumen de Talleres</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Talleres activos:</th>
+                                <td class="text-end">{{ talleres_activos }}</td>
+                            </tr>
+                            <tr>
+                                <th>Talleres finalizados:</th>
+                                <td class="text-end">{{ talleres_finalizados }}</td>
+                            </tr>
+                            <tr class="table-info">
+                                <th>Total talleres:</th>
+                                <td class="text-end fw-bold">{{ total_talleres }}</td>
+                            </tr>
+                            <tr>
+                                <th>Asistencia promedio:</th>
+                                <td class="text-end">{{ asistencia_promedio|floatformat:2 }} participantes</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Listado de Talleres</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Facilitador</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Estado</th>
+                                        <th class="text-end">Participantes</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for taller in listado_talleres %}
+                                    <tr>
+                                        <td>{{ taller.nombre }}</td>
+                                        <td>{{ taller.facilitador }}</td>
+                                        <td>{{ taller.fecha_inicio|date:"d/m/Y" }}</td>
+                                        <td>{% if taller.fecha_fin %}{{ taller.fecha_fin|date:"d/m/Y" }}{% else %}<span class="badge bg-warning">En curso</span>{% endif %}</td>
+                                        <td>
+                                            <span class="badge bg-{% if taller.estado == 'EN_CURSO' %}success{% elif taller.estado == 'PROGRAMADO' %}warning{% elif taller.estado == 'FINALIZADO' %}secondary{% elif taller.estado == 'CANCELADO' %}danger{% endif %}">
+                                                {{ taller.get_estado_display }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">{{ taller.participantes.count }}</td>
+                                        <td class="text-center">
+                                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> Ver detalles
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center">No hay talleres registrados</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

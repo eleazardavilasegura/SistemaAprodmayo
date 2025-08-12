@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar{% else %}Crear{% endif %} Categoría - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{% if object %}Editar{% else %}Crear{% endif %} Categoría</h2>
+        <a href="{% url 'categoria_list' %}" class="btn btn-light">Ver todas las categorías</a>
+    </div>
+    <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        {{ form.nombre }}
+                        {% if form.nombre.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.nombre.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo <span class="text-danger">*</span></label>
+                        {{ form.tipo }}
+                        {% if form.tipo.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.tipo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.descripcion.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-check">
+                        {{ form.es_activa }}
+                        <label class="form-check-label" for="{{ form.es_activa.id_for_label }}">
+                            Categoría activa
+                        </label>
+                    </div>
+                    <small class="text-muted">
+                        Las categorías inactivas no aparecerán en los formularios de ingreso y egreso.
+                    </small>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'categoria_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}Actualizar{% else %}Crear{% endif %} Categoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación del formulario
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "reportes/pdf_base.html" %}
+{% load static %}
+
+{% block report_title %}Reporte de Beneficiarias{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <div class="report-header">
+        <h3>Listado de Beneficiarias</h3>
+        <p>Fecha de generación: {{ fecha_generacion }}</p>
+        <p>Total de beneficiarias: {{ beneficiarias|length }}</p>
+    </div>
+    
+    <div class="report-body">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>DNI</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for beneficiaria in beneficiarias %}
+                <tr>
+                    <td>{{ beneficiaria.id }}</td>
+                    <td>{{ beneficiaria.nombres }} {{ beneficiaria.apellidos }}</td>
+                    <td>{{ beneficiaria.documento_identidad }}</td>
+                    <td>{{ beneficiaria.direccion }}</td>
+                    <td>{{ beneficiaria.telefono }}</td>
+                    <td>
+                        <span class="badge {% if beneficiaria.estado == 'activa' %}badge-success{% else %}badge-danger{% endif %}">
+                            {% if beneficiaria.estado == 'activa' %}Activa{% else %}Inactiva{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3 style="margin-top: 30px;">Acompañantes por Beneficiaria</h3>
+        
+        {% for beneficiaria in beneficiarias %}
+            {% if beneficiaria.acompanantes.all %}
+                <div style="margin-top: 20px;">
+                    <h4>Acompañantes de {{ beneficiaria.nombres }} {{ beneficiaria.apellidos }}</h4>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Parentesco</th>
+                                <th>Teléfono</th>
+                                <th>Documento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for acompanante in beneficiaria.acompanantes.all %}
+                            <tr>
+                                <td>{{ acompanante.nombres }} {{ acompanante.apellidos }}</td>
+                                <td>{{ acompanante.get_parentesco_display() }}</td>
+                                <td>{{ acompanante.telefono }}</td>
+                                <td>{{ acompanante.documento_identidad }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

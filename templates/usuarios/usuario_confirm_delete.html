@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Usuario - APRODMAYO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-card {
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .delete-header {
+        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+        color: white;
+        padding: 1.5rem;
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 15px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-avatar-text {
+        font-size: 32px;
+        font-weight: 700;
+        color: #dc3545;
+    }
+    
+    .warning-icon {
+        font-size: 3rem;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="delete-card">
+            <div class="delete-header">
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar me-3">
+                        {% if object.imagen_perfil %}
+                        <img src="{{ object.imagen_perfil.url }}" alt="{{ object.username }}">
+                        {% else %}
+                        <span class="user-avatar-text">{{ object.username|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="mb-0">Eliminar Usuario</h4>
+                        <p class="mb-0">{{ object.get_full_name|default:object.username }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="warning-icon">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <h4 class="mb-3">¿Está seguro que desea eliminar este usuario?</h4>
+                    <p class="text-muted mb-0">
+                        Esta acción eliminará permanentemente al usuario <strong>{{ object.username }}</strong> 
+                        y toda su información asociada del sistema. Esta acción no se puede deshacer.
+                    </p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Información del usuario</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Nombre de usuario:</strong> {{ object.username }}</p>
+                                <p class="mb-2"><strong>Nombre completo:</strong> {{ object.get_full_name|default:"No especificado" }}</p>
+                                <p class="mb-2"><strong>Email:</strong> {{ object.email|default:"No especificado" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Rol:</strong> {{ object.get_role_display }}</p>
+                                <p class="mb-2"><strong>Estado:</strong> 
+                                    {% if object.is_active %}
+                                    <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-2"><strong>Fecha de registro:</strong> {{ object.date_joined|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'usuario_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-2"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i> Eliminar Usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

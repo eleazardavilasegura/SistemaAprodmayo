@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Certificados - {{ taller.nombre }} | APRODMAYO{% endblock %}
+
+{% block custom_css %}
+<style>
+    .participant-row {
+        transition: all .2s;
+    }
+    .participant-row:hover {
+        background-color: rgba(0,123,255,0.05);
+    }
+    .eligibility-icon {
+        font-size: 1.2rem;
+    }
+    .certificate-header {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.65rem;
+    }
+    .progress-bar {
+        height: 8px;
+        border-radius: 4px;
+    }
+    .attendance-info {
+        display: flex;
+        align-items: center;
+    }
+    .attendance-info .progress {
+        flex-grow: 1;
+        margin: 0 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado y navegación -->
+    <nav class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'taller_list' %}">Talleres</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'taller_detail' taller.id %}">{{ taller.nombre }}</a></li>
+            <li class="breadcrumb-item active">Certificados</li>
+        </ol>
+    </nav>
+
+    <div class="certificate-header">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h2 mb-0">
+                <i class="fas fa-certificate me-2"></i>
+                Emisión de Certificados
+            </h1>
+            
+            <div>
+                {% if taller.estado == 'FINALIZADO' %}
+                    <span class="badge bg-success">Taller Finalizado</span>
+                {% else %}
+                    <span class="badge bg-warning">
+                        Taller {{ taller.get_estado_display }} - Los certificados solo están disponibles para talleres finalizados
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h4>{{ taller.nombre }}</h4>
+                <p>
+                    <i class="fas fa-calendar me-2"></i>
+                    {{ taller.fecha_inicio|date:"d/m/Y" }} - {{ taller.fecha_fin|date:"d/m/Y" }}
+                </p>
+                <p>
+                    <i class="fas fa-user me-2"></i>
+                    Facilitador: {{ taller.facilitador }}
+                </p>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-info">
+                    <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Requisitos para Certificación</h5>
+                    <ul class="mb-0">
+                        <li>El taller debe estar en estado "Finalizado"</li>
+                        <li>El participante debe tener estado "Confirmado"</li>
+                        <li>Mínimo 80% de asistencia</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if participantes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Participante</th>
+                        <th>DNI</th>
+                        <th>Estado</th>
+                        <th>Asistencia</th>
+                        <th>Elegible</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in participantes %}
+                        <tr class="participant-row">
+                            <td>
+                                <div class="fw-bold">{{ item.participante.nombre_completo }}</div>
+                                {% if item.participante.beneficiaria %}
+                                    <small class="text-muted"><i class="fas fa-user-check me-1"></i>Beneficiaria</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.participante.dni }}</td>
+                            <td>
+                                {% if item.participante.estado == 'CONFIRMADO' %}
+                                    <span class="badge bg-success status-badge">Confirmado</span>
+                                {% elif item.participante.estado == 'PENDIENTE' %}
+                                    <span class="badge bg-warning status-badge">Pendiente</span>
+                                {% else %}
+                                    <span class="badge bg-danger status-badge">Retirado</span>
+                                {% endif %}
+                            </td>
+                            <td class="attendance-info">
+                                <span class="text-nowrap">{{ item.asistencias }} / {{ item.total_sesiones }}</span>
+                                <div class="progress w-100 mx-2">
+                                    <div class="progress-bar {% if item.porcentaje_asistencia >= 80 %}bg-success{% elif item.porcentaje_asistencia >= 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ item.porcentaje_asistencia }}%;" 
+                                         aria-valuenow="{{ item.porcentaje_asistencia }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="text-nowrap">{{ item.porcentaje_asistencia|floatformat:1 }}%</span>
+                            </td>
+                            <td class="text-center">
+                                {% if item.cumple_requisito and item.participante.estado == 'CONFIRMADO' and taller.estado == 'FINALIZADO' %}
+                                    <i class="fas fa-check-circle text-success eligibility-icon" title="Elegible para certificado"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-danger eligibility-icon" title="No elegible para certificado"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.cumple_requisito and item.participante.estado == 'CONFIRMADO' and taller.estado == 'FINALIZADO' %}
+                                    <a href="{% url 'generar_certificado' item.participante.id %}" class="btn btn-sm btn-primary" target="_blank">
+                                        <i class="fas fa-certificate me-1"></i> Generar Certificado
+                                    </a>
+                                {% elif item.participante.estado == 'CONFIRMADO' and taller.estado == 'FINALIZADO' %}
+                                    <a href="{% url 'generar_certificado' item.participante.id %}" class="btn btn-sm btn-outline-warning" target="_blank">
+                                        <i class="fas fa-certificate me-1"></i> Generar (No Oficial)
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>
+                                        <i class="fas fa-certificate me-1"></i> No Disponible
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay participantes registrados en este taller que sean elegibles para recibir certificados.
+        </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{% url 'taller_detail' taller.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Taller
+        </a>
+    </div>
+</div>
+{% endblock %}

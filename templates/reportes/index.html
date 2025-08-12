@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="bi bi-bar-chart"></i> Reportes</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <h4>Seleccione el tipo de reportes que desea consultar:</h4>
+                <p class="text-muted">Acceda a los diferentes módulos de reportes disponibles en el sistema. Puede exportar los reportes en formato PDF o Excel.</p>
+                
+                <div class="alert alert-info">
+                    <h5>Previsualizaciones de los nuevos formatos de reportes</h5>
+                    <div class="btn-group mt-2">
+                        <a href="{% url 'reportes_index' %}?preview_pdf=1&tipo=beneficiarias" class="btn btn-danger btn-sm" target="_blank">
+                            <i class="bi bi-file-pdf"></i> Vista previa - Beneficiarias
+                        </a>
+                        <a href="{% url 'reportes_index' %}?preview_pdf=1&tipo=talleres" class="btn btn-danger btn-sm" target="_blank">
+                            <i class="bi bi-file-pdf"></i> Vista previa - Talleres
+                        </a>
+                        <a href="{% url 'reportes_index' %}?preview_pdf=1&tipo=finanzas" class="btn btn-danger btn-sm" target="_blank">
+                            <i class="bi bi-file-pdf"></i> Vista previa - Balance Financiero
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Reportes de Talleres -->
+            {% if user.can_access_talleres %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Reportes de Talleres</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Acceda a informes sobre asistencia, evaluaciones y resultados de los talleres.</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="{% url 'reporte_talleres' %}" class="text-decoration-none">
+                                    <i class="bi bi-clipboard-data"></i> Reporte General de Talleres
+                                </a>
+                                <div class="mt-2">
+                                    <small>
+                                        <a href="{% url 'reporte_talleres' %}?formato=pdf" class="badge bg-danger">
+                                            <i class="bi bi-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="{% url 'reporte_talleres' %}?formato=excel" class="badge bg-success">
+                                            <i class="bi bi-file-excel"></i> Excel
+                                        </a>
+                                    </small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'taller_list' %}" class="text-decoration-none">
+                                    <i class="bi bi-list-ul"></i> Seleccionar un taller específico
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reportes de Finanzas -->
+            {% if user.can_access_finanzas %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-cash-coin"></i> Reportes Financieros</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Consulte informes financieros, balances, ingresos y egresos.</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="{% url 'reporte_balance_financiero' %}" class="text-decoration-none">
+                                    <i class="bi bi-graph-up"></i> Balance Financiero
+                                </a>
+                                <div class="mt-2">
+                                    <small>
+                                        <a href="{% url 'reporte_balance_financiero' %}?formato=pdf" class="badge bg-danger">
+                                            <i class="bi bi-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="{% url 'reporte_balance_financiero' %}?formato=excel" class="badge bg-success">
+                                            <i class="bi bi-file-excel"></i> Excel
+                                        </a>
+                                    </small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'dashboard_financiero' %}" class="text-decoration-none">
+                                    <i class="bi bi-graph-up"></i> Dashboard Financiero
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'informe_list' %}" class="text-decoration-none">
+                                    <i class="bi bi-file-earmark-text"></i> Informes Financieros
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reportes de Beneficiarias -->
+            {% if user.can_access_beneficiarias %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-people"></i> Reportes de Beneficiarias</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Vea estadísticas y datos sobre las beneficiarias registradas.</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a href="{% url 'reporte_beneficiarias' %}" class="text-decoration-none">
+                                    <i class="bi bi-clipboard-data"></i> Reporte General de Beneficiarias
+                                </a>
+                                <div class="mt-2">
+                                    <small>
+                                        <a href="{% url 'reporte_beneficiarias' %}?formato=pdf" class="badge bg-danger">
+                                            <i class="bi bi-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="{% url 'reporte_beneficiarias' %}?formato=excel" class="badge bg-success">
+                                            <i class="bi bi-file-excel"></i> Excel
+                                        </a>
+                                    </small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'beneficiaria_list' %}" class="text-decoration-none">
+                                    <i class="bi bi-list-ul"></i> Listado de Beneficiarias
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

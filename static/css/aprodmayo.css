@@ -1,0 +1,214 @@
+/* Archivo de estilos principal para APRODMAYO */
+
+:root {
+    --primary: #702c8c;
+    --primary-dark: #493240;
+    --secondary: #6a4a77;
+    --accent: #8a4da8;
+    --light-purple: #f1eef3;
+    --text-dark: #2d2d2d;
+    --text-light: #f8f9fa;
+    --bg-light: #f8f9fa;
+    --bg-dark: #2d2d2d;
+    --success: #28a745;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
+}
+
+/* Tipografía general */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navegación */
+.navbar-custom {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(112, 44, 140, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Cards */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: var(--light-purple);
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* Tablas */
+.table thead {
+    background-color: var(--light-purple);
+}
+
+.table thead th {
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* Badges */
+.badge-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.badge-secondary {
+    background-color: var(--secondary);
+    color: white;
+}
+
+/* Animaciones */
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Fondos y colores */
+.bg-primary-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.bg-light-purple {
+    background-color: var(--light-purple);
+}
+
+.text-primary-custom {
+    color: var(--primary);
+}
+
+.text-secondary-custom {
+    color: var(--secondary);
+}
+
+/* Forms */
+.form-control:focus, 
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(112, 44, 140, 0.25);
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--light-purple);
+}
+
+/* Utilidades */
+.section-title {
+    position: relative;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    color: var(--primary);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+/* Paginación */
+.page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.page-link {
+    color: var(--primary);
+}
+
+.page-link:hover {
+    color: var(--primary-dark);
+}
+
+/* Dashboard widgets */
+.dashboard-card {
+    border-radius: 15px;
+    overflow: hidden;
+    border-top: 4px solid var(--primary);
+    margin-bottom: 20px;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+    color: white;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* Animaciones de página */
+.page-transition {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

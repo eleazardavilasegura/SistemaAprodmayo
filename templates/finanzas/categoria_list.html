@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Categorías - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Categorías</h2>
+        <a href="{% url 'categoria_create' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nueva Categoría
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Filtros -->
+        <form method="get" class="mb-4 row g-3">
+            <div class="col-md-4">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select name="tipo" id="tipo" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="INGRESO" {% if request.GET.tipo == 'INGRESO' %}selected{% endif %}>Ingreso</option>
+                    <option value="EGRESO" {% if request.GET.tipo == 'EGRESO' %}selected{% endif %}>Egreso</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="estado" class="form-label">Estado</label>
+                <select name="estado" id="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <option value="1" {% if request.GET.estado == '1' %}selected{% endif %}>Activa</option>
+                    <option value="0" {% if request.GET.estado == '0' %}selected{% endif %}>Inactiva</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="buscar" class="form-label">Buscar</label>
+                <div class="input-group">
+                    <input type="text" name="q" id="buscar" class="form-control" placeholder="Nombre, descripción..." value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Tabla de categorías -->
+        {% if object_list %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categoria in object_list %}
+                            <tr>
+                                <td>{{ categoria.nombre }}</td>
+                                <td>{{ categoria.descripcion|default:"-" }}</td>
+                                <td>
+                                    <span class="badge {% if categoria.tipo == 'INGRESO' %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ categoria.get_tipo_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge {% if categoria.es_activa %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if categoria.es_activa %}Activa{% else %}Inactiva{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'categoria_update' categoria.id %}" class="btn btn-warning" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'categoria_delete' categoria.id %}" class="btn btn-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <nav aria-label="Navegación de páginas" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Primera">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;&laquo;</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+                                <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        {{ i }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Última">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-warning">
+                <p class="mb-0">No hay categorías que coincidan con los criterios de búsqueda.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

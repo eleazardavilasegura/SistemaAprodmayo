@@ -1,0 +1,77 @@
+{% extends "reportes/pdf_base.html" %}
+{% load static %}
+
+{% block report_title %}Reporte de Talleres{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <div class="report-header">
+        <h3>Listado de Talleres</h3>
+        <p>Fecha de generación: {{ fecha_generacion }}</p>
+        <p>Total de talleres: {{ talleres|length }}</p>
+    </div>
+    
+    <div class="report-body">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha Inicio</th>
+                    <th>Horario</th>
+                    <th>Capacidad</th>
+                    <th>Facilitador</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for taller in talleres %}
+                <tr>
+                    <td>{{ taller.id }}</td>
+                    <td>{{ taller.nombre }}</td>
+                    <td>{{ taller.fecha_inicio|date:"d/m/Y" }}</td>
+                    <td>{{ taller.horario }}</td>
+                    <td>{{ taller.capacidad }} personas</td>
+                    <td>{{ taller.facilitador }}</td>
+                    <td>
+                        <span class="badge {% if taller.estado == 'PROGRAMADO' %}badge-warning{% elif taller.estado == 'FINALIZADO' %}badge-success{% elif taller.estado == 'CANCELADO' %}badge-danger{% else %}badge-secondary{% endif %}">
+                            {{ taller.get_estado_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if asistencias %}
+    <div class="report-section">
+        <h4>Detalle de Asistencias</h4>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Taller</th>
+                    <th>Beneficiaria</th>
+                    <th>Estado</th>
+                    <th>Comentario</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias %}
+                <tr>
+                    <td>{{ asistencia.taller.nombre }}</td>
+                    <td>{{ asistencia.beneficiaria.nombres }} {{ asistencia.beneficiaria.apellidos }}</td>
+                    <td>
+                        <span class="badge {% if asistencia.estado == 'PRESENTE' %}badge-success{% elif asistencia.estado == 'AUSENTE' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ asistencia.get_estado_display }}
+                        </span>
+                    </td>
+                    <td>{{ asistencia.comentario|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

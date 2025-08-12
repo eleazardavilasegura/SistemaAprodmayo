@@ -1,0 +1,322 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Reporte - APRODMAYO{% endblock %}</title>
+    <!-- 
+        Configuración específica para PDF - Uso de meta tags en vez de CSS para evitar errores de sintaxis
+    -->
+    <meta name="pdf:pagesize" content="letter portrait">
+    <meta name="pdf:margin" content="1cm">
+    <meta name="pdf:headerfooter" content="true">
+    
+    <!-- Esta parte del CSS es estándar y no genera errores -->
+    <style type="text/css">
+        @page {
+            size: letter portrait;
+            margin: 1cm;
+        }
+    </style>
+    
+    <!-- 
+        Las reglas especiales de frame las definimos usando script 
+        que solo se procesará cuando se genere el PDF
+    -->
+    <script type="application/pdf">
+        @page {
+            @frame header_frame {
+                -pdf-frame-content: headerContent;
+                top: 0.3cm;
+                margin-left: 0.5cm;
+                margin-right: 0.5cm;
+                height: 2cm;
+            }
+            @frame footer_frame {
+                -pdf-frame-content: footerContent;
+                bottom: 0cm;
+                margin-left: 0.5cm;
+                margin-right: 0.5cm;
+                height: 0.8cm;
+            }
+            /* No definimos un content_frame específico para permitir que el contenido
+               fluya naturalmente entre el encabezado y el pie de página */
+        }
+    </script>
+        
+    <!-- Estilos generales -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            line-height: 1.2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            margin-top: 1.3cm;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 0.3cm;
+            border-bottom: 1px solid #702c8c;
+            padding-bottom: 0.2cm;
+        }
+        .header img {
+            max-height: 1.5cm;
+            margin-bottom: 0.2cm;
+        }
+        h1, h2, h3, h4, h5 {
+            color: #702c8c;
+            margin: 0 0 4px 0;
+        }
+        h1 {
+            font-size: 18px;
+        }
+        h2 {
+            font-size: 14px;
+        }
+        h3 {
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.3cm;
+            table-layout: fixed; /* Control fijo para anchos de columna */
+            page-break-inside: avoid; /* Evitar que las tablas se corten entre páginas si es posible */
+            overflow: visible; /* Asegurar que el contenido sea visible */
+        }
+        table, th, td {
+            border: 0.5px solid #ddd;
+        }
+        th {
+            background-color: #f1eef3;
+            color: #702c8c;
+            font-weight: bold;
+            text-align: left;
+            padding: 4px 6px;
+            font-size: 11px;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            border: 0.5px solid #ddd;
+        }
+        td {
+            padding: 4px 6px;
+            vertical-align: top;
+            font-size: 10px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            border: 0.5px solid #ddd;
+        }
+        /* Nuevas clases para manejar tablas con diferentes anchos de columna */
+        .col-xs { width: auto; min-width: 5%; }
+        .col-sm { width: auto; min-width: 10%; }
+        .col-md { width: auto; min-width: 15%; }
+        .col-lg { width: auto; min-width: 25%; }
+        .col-xl { width: auto; min-width: 35%; }
+        
+        /* Clases específicas para columnas más comunes */
+        .col-id { width: 5%; } /* Para columnas de ID */
+        .col-telefono { width: 12%; } /* Para columnas de teléfono */
+        .col-parentesco { width: 15%; } /* Para columnas de parentesco */
+        .col-nombre { width: 30%; } /* Para columnas de nombre */
+        
+        /* Ajuste automático para tablas */
+        .auto-table {
+            table-layout: auto;
+            width: 100%;
+        }
+        
+        /* Para texto largo en celdas */
+        .text-wrap {
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        /* Para tablas con muchos datos */
+        .compact-table {
+            font-size: 8px !important;
+        }
+        .compact-table th,
+        .compact-table td {
+            padding: 2px 3px !important;
+        }
+        
+        /* Para tablas de información secundaria */
+        .small-table {
+            max-width: 98%;
+            margin: 0 auto;
+        }
+        
+        /* Para ajuste automático de celdas según su contenido */
+        .cell-fit {
+            width: 1%; /* Truco para que la celda se ajuste a su contenido */
+            white-space: nowrap;
+        }
+        
+        /* Para manejar texto muy largo en celdas */
+        .long-text {
+            font-size: 7px;
+            max-height: 3em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            box-orient: vertical;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .section {
+            margin-bottom: 0.5cm;
+        }
+        .footer {
+            text-align: center;
+            font-size: 8px;
+            color: #666;
+            padding-top: 0.3cm;
+            border-top: 1px solid #ddd;
+        }
+        .summary-table td:first-child {
+            font-weight: bold;
+            width: 60%;
+        }
+        .total-row {
+            background-color: #f1eef3;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .badge {
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            color: white;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .badge-secondary {
+            background-color: #6c757d;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .page-number {
+            text-align: right;
+        }
+        
+        /* Clases adicionales para los reportes */
+        .report-container {
+            padding: 0;
+            width: 100%;
+        }
+        .report-header {
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+        }
+        .report-body {
+            margin-bottom: 12px;
+        }
+        .report-section {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .report-summary {
+            margin: 12px 0;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        .col {
+            flex-basis: 0;
+            flex-grow: 1;
+            max-width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.25rem;
+            margin-bottom: 15px;
+        }
+        .card-body {
+            flex: 1 1 auto;
+            padding: 0.8rem;
+        }
+        .amount {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .thead-light th {
+            background-color: #f1eef3;
+            color: #702c8c;
+        }
+    </style>
+</head>
+<body>
+    <div id="headerContent">
+        <table style="border: none; width: 100%;">
+            <tr style="border: none;">
+                <td style="border: none; width: 20%; text-align: left;">
+                    <img src="{{ logo_url }}" alt="APRODMAYO" style="max-width: 100%; height: auto; max-height: 2cm; padding: 0.2cm; background-color: #702c8c; border-radius: 6px;">
+                </td>
+                <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
+                    <h1 style="font-size: 20px; color: #702c8c; margin-bottom: 4px;">APRODMAYO</h1>
+                    <h2 style="font-size: 16px; color: #493240;">{% block report_title %}Reporte{% endblock %}</h2>
+                </td>
+                <td style="border: none; width: 20%; text-align: right; vertical-align: top;">
+                    <div style="font-size: 9px; color: #666; padding: 4px; background-color: #f1eef3; border-radius: 4px; display: inline-block;">
+                        Fecha de generación:<br>
+                        <strong>{{ fecha_generacion|date:"d/m/Y" }}</strong>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <div id="footerContent" class="footer">
+        <div style="width:100%; text-align:center; font-size:10px; border-top:1px solid #ddd; padding-top:5px;">
+            © {% now "Y" %} APRODMAYO - Todos los derechos reservados | Página <pdf:pagenumber></pdf:pagenumber> de <pdf:pagecount></pdf:pagecount>
+        </div>
+    </div>
+</body>
+</html>

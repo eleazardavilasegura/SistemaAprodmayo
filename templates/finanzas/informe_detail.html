@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load finanzas_filters %}
+
+{% block title %}Detalle de Informe - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ object.titulo }}</h2>
+        <div>
+            <a href="{% url 'informe_pdf' object.id %}" class="btn btn-secondary me-2">
+                <i class="bi bi-file-pdf"></i> Descargar PDF
+            </a>
+            <a href="{% url 'informe_list' %}" class="btn btn-light">
+                Volver a la lista
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <!-- Información general del informe -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Información del Informe</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p class="mb-1 text-muted">Fecha de Generación</p>
+                                <p class="fw-bold">{{ object.fecha_generacion|date:"d/m/Y" }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1 text-muted">Responsable</p>
+                                <p class="fw-bold">{{ object.responsable }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p class="mb-1 text-muted">Período</p>
+                                <p class="fw-bold">{{ object.fecha_inicio|date:"d/m/Y" }} - {{ object.fecha_fin|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if object.notas %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <p class="mb-1 text-muted">Notas</p>
+                                    <p>{{ object.notas }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Resumen financiero -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Resumen Financiero</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="alert alert-success h-100">
+                                    <h5>Ingresos Totales</h5>
+                                    <h3>{{ object.total_ingresos|money_format }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-danger h-100">
+                                    <h5>Egresos Totales</h5>
+                                    <h3>{{ object.total_egresos|money_format }}</h3>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert {% if object.saldo >= 0 %}alert-info{% else %}alert-warning{% endif %} h-100">
+                                    <h5>Saldo</h5>
+                                    <h3 class="{{ object.saldo|positive_class }}">{{ object.saldo|money_format }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Distribución de Ingresos y Egresos - Tablas sin cálculos complejos -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Distribución de Ingresos</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if ingresos_por_categoria %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Categoría</th>
+                                                    <th class="text-end">Monto</th>
+                                                    <th class="text-end">Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for ingreso in ingresos_por_categoria %}
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="color-indicator bg-primary me-2"></div>
+                                                                {{ ingreso.categoria__nombre }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-end">{{ ingreso.total|money_format }}</td>
+                                                        <td class="text-end">
+                                                            {% if object.total_ingresos > 0 %}
+                                                                {{ ingreso.total|percentage:object.total_ingresos }}%
+                                                            {% else %}
+                                                                0%
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <p class="mb-0">No hay datos de ingresos por categoría para mostrar.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Distribución de Egresos</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if egresos_por_categoria %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Categoría</th>
+                                                    <th class="text-end">Monto</th>
+                                                    <th class="text-end">Porcentaje</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for egreso in egresos_por_categoria %}
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="color-indicator bg-danger me-2"></div>
+                                                                {{ egreso.categoria__nombre }}
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-end">{{ egreso.total|money_format }}</td>
+                                                        <td class="text-end">
+                                                            {% if object.total_egresos > 0 %}
+                                                                {{ egreso.total|percentage:object.total_egresos }}%
+                                                            {% else %}
+                                                                0%
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <p class="mb-0">No hay datos de egresos por categoría para mostrar.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Detalles de ingresos -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Detalle de Ingresos</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if ingresos %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Categoría</th>
+                                            <th>Descripción</th>
+                                            <th>Comprobante</th>
+                                            <th class="text-end">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ingreso in ingresos %}
+                                            <tr>
+                                                <td>{{ ingreso.fecha|date:"d/m/Y" }}</td>
+                                                <td>{{ ingreso.categoria.nombre }}</td>
+                                                <td>{{ ingreso.descripcion }}</td>
+                                                <td>{{ ingreso.comprobante|default:"-" }}</td>
+                                                <td class="text-end">{{ ingreso.monto|money_format }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <p class="mb-0">No hay ingresos registrados en el período del informe.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Detalles de egresos -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Detalle de Egresos</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if egresos %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Categoría</th>
+                                            <th>Descripción</th>
+                                            <th>Comprobante</th>
+                                            <th class="text-end">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for egreso in egresos %}
+                                            <tr>
+                                                <td>{{ egreso.fecha|date:"d/m/Y" }}</td>
+                                                <td>{{ egreso.categoria.nombre }}</td>
+                                                <td>{{ egreso.descripcion }}</td>
+                                                <td>{{ egreso.comprobante|default:"-" }}</td>
+                                                <td class="text-end">{{ egreso.monto|money_format }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <p class="mb-0">No hay egresos registrados en el período del informe.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos adicionales para los indicadores de color */
+    .color-indicator {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}

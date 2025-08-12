@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Generar Informe Financiero - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Generar Informe Financiero</h2>
+        <a href="{% url 'informe_list' %}" class="btn btn-light">Ver informes anteriores</a>
+    </div>
+    <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.titulo.id_for_label }}" class="form-label">Título del Informe <span class="text-danger">*</span></label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.titulo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fecha_generacion.id_for_label }}" class="form-label">Fecha de Generación <span class="text-danger">*</span></label>
+                        {{ form.fecha_generacion }}
+                        {% if form.fecha_generacion.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.fecha_generacion.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">Período desde <span class="text-danger">*</span></label>
+                        {{ form.fecha_inicio }}
+                        {% if form.fecha_inicio.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.fecha_inicio.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.fecha_fin.id_for_label }}" class="form-label">Período hasta <span class="text-danger">*</span></label>
+                        {{ form.fecha_fin }}
+                        {% if form.fecha_fin.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.fecha_fin.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.responsable.id_for_label }}" class="form-label">Responsable del Informe <span class="text-danger">*</span></label>
+                        {{ form.responsable }}
+                        {% if form.responsable.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.responsable.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="{{ form.notas.id_for_label }}" class="form-label">Notas Adicionales</label>
+                        {{ form.notas }}
+                        {% if form.notas.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.notas.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <h5>Resumen financiero del período seleccionado:</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Total ingresos:</strong> S/. {{ total_ingresos }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Total egresos:</strong> S/. {{ total_egresos }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="mb-0"><strong>Saldo:</strong> <span class="{{ saldo >= 0 ? 'text-success' : 'text-danger' }}">S/. {{ saldo }}</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Generar Informe</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación del formulario
+        const form = document.querySelector('.needs-validation');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+        
+        // Actualizar resumen al cambiar fechas
+        const fechaInicio = document.getElementById('{{ form.fecha_inicio.id_for_label }}');
+        const fechaFin = document.getElementById('{{ form.fecha_fin.id_for_label }}');
+        
+        const actualizarResumen = function() {
+            if (fechaInicio.value && fechaFin.value) {
+                // Hacer una solicitud AJAX para obtener los nuevos totales
+                fetch(`{% url 'obtener_resumen_finanzas' %}?fecha_inicio=${fechaInicio.value}&fecha_fin=${fechaFin.value}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelector('.alert-info').innerHTML = `
+                            <h5>Resumen financiero del período seleccionado:</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p class="mb-0"><strong>Total ingresos:</strong> S/. ${data.total_ingresos}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-0"><strong>Total egresos:</strong> S/. ${data.total_egresos}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-0"><strong>Saldo:</strong> <span class="${data.saldo >= 0 ? 'text-success' : 'text-danger'}">S/. ${data.saldo}</span></p>
+                                </div>
+                            </div>
+                        `;
+                    });
+            }
+        };
+        
+        fechaInicio.addEventListener('change', actualizarResumen);
+        fechaFin.addEventListener('change', actualizarResumen);
+    });
+</script>
+{% endblock %}

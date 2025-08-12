@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Listado de Talleres | APRODMAYO{% endblock %}
+
+{% block custom_css %}
+<style>
+    .taller-card {
+        transition: transform .2s;
+    }
+    .taller-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+    .estado-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    .stats-card {
+        border-left: 4px solid #6c757d;
+        transition: all .2s;
+    }
+    .stats-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    .stats-activo {
+        border-left-color: #28a745;
+    }
+    .stats-proximo {
+        border-left-color: #17a2b8;
+    }
+    .stats-finalizado {
+        border-left-color: #dc3545;
+    }
+    .stats-total {
+        border-left-color: #6610f2;
+    }
+    .filter-section {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0">
+            <i class="fas fa-chalkboard-teacher me-2"></i>
+            Gestión de Talleres
+        </h1>
+        <a href="{% url 'taller_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nuevo Taller
+        </a>
+    </div>
+    
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card stats-total h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Total Talleres</h5>
+                    <h2 class="display-5">{{ total_talleres }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card stats-activo h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Talleres Activos</h5>
+                    <h2 class="display-5">{{ talleres_activos }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card stats-proximo h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Talleres Próximos</h5>
+                    <h2 class="display-5">{{ talleres_proximos }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card stats-finalizado h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Talleres Finalizados</h5>
+                    <h2 class="display-5">{{ talleres_finalizados }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filter-section mb-4">
+        <form method="get" class="row align-items-center">
+            <div class="col-md-4 mb-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" name="q" value="{{ request.GET.q }}" 
+                           class="form-control" placeholder="Buscar por nombre, descripción, etc.">
+                </div>
+            </div>
+            <div class="col-md-3 mb-2">
+                <select name="estado" class="form-select">
+                    <option value="">-- Estado --</option>
+                    <option value="PROGRAMADO" {% if request.GET.estado == 'PROGRAMADO' %}selected{% endif %}>Programado</option>
+                    <option value="EN_CURSO" {% if request.GET.estado == 'EN_CURSO' %}selected{% endif %}>En curso</option>
+                    <option value="FINALIZADO" {% if request.GET.estado == 'FINALIZADO' %}selected{% endif %}>Finalizado</option>
+                    <option value="CANCELADO" {% if request.GET.estado == 'CANCELADO' %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <select name="periodo" class="form-select">
+                    <option value="">-- Periodo --</option>
+                    <option value="actual" {% if request.GET.periodo == 'actual' %}selected{% endif %}>En curso</option>
+                    <option value="proximo" {% if request.GET.periodo == 'proximo' %}selected{% endif %}>Próximos</option>
+                    <option value="finalizado" {% if request.GET.periodo == 'finalizado' %}selected{% endif %}>Finalizados</option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+    
+    {% if talleres %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for taller in talleres %}
+                <div class="col">
+                    <div class="card h-100 taller-card">
+                        {% if taller.estado == 'CANCELADO' %}
+                            <div class="card-header bg-danger text-white text-center p-2">Cancelado</div>
+                        {% endif %}
+                        
+                        {% if taller.estado == 'EN_CURSO' %}
+                            <div class="estado-badge badge bg-success">En curso</div>
+                        {% elif taller.estado == 'FINALIZADO' %}
+                            <div class="estado-badge badge bg-secondary">Finalizado</div>
+                        {% elif taller.estado == 'PROGRAMADO' %}
+                            <div class="estado-badge badge bg-info">Programado</div>
+                        {% elif taller.estado == 'CANCELADO' %}
+                            <div class="estado-badge badge bg-danger">Cancelado</div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">{{ taller.nombre }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                <i class="fas fa-user me-1"></i> {{ taller.facilitador }}
+                            </h6>
+                            <p class="card-text">{{ taller.descripcion|truncatechars:100 }}</p>
+                            <div class="d-flex mb-3">
+                                <div class="me-3">
+                                    <small class="text-muted d-block">Fecha inicio</small>
+                                    <span class="fw-bold">{{ taller.fecha_inicio }}</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Fecha fin</small>
+                                    <span class="fw-bold">{{ taller.fecha_fin }}</span>
+                                </div>
+                            </div>
+                            <div class="progress mb-2" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" 
+                                     style="width: {{ taller.porcentaje_ocupacion }}%;" 
+                                     aria-valuenow="{{ taller.porcentaje_ocupacion }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                <span class="fw-bold">
+                                    {{ taller.participante_set.count }}/{{ taller.capacidad }}
+                                </span> participantes
+                            </small>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="btn-group w-100">
+                                <a href="{% url 'taller_detail' taller.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i> Ver detalles
+                                </a>
+                                <a href="{% url 'participante_list' taller.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-users me-1"></i> Participantes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Paginación -->
+        {% if is_paginated %}
+            <nav aria-label="Paginación" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if current_filters %}&{{ current_filters }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_filters %}&{{ current_filters }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_filters %}&{{ current_filters }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_filters %}&{{ current_filters }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+        
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay talleres disponibles con los criterios seleccionados.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // Mantener los filtros al cambiar de página
+    $(document).ready(function() {
+        // Código JavaScript adicional si es necesario
+    });
+</script>
+{% endblock %}

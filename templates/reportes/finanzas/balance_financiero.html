@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Balance Financiero - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h2 class="mb-0"><i class="bi bi-cash-coin"></i> Balance Financiero</h2>
+        <div>
+            <a href="{% url 'reporte_balance_financiero' %}?formato=pdf" class="btn btn-light btn-sm ms-2">
+                <i class="bi bi-file-pdf"></i> Exportar a PDF
+            </a>
+            <a href="{% url 'reporte_balance_financiero' %}?formato=excel" class="btn btn-light btn-sm ms-2">
+                <i class="bi bi-file-excel"></i> Exportar a Excel
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h4>Reporte generado el {{ hoy|date:"d/m/Y" }}</h4>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Balance del Mes Actual ({{ primer_dia_mes_actual|date:"d/m/Y" }} - {{ hoy|date:"d/m/Y" }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Total Ingresos:</th>
+                                <td class="text-end">S/ {{ ingresos_mes_actual|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Egresos:</th>
+                                <td class="text-end">S/ {{ egresos_mes_actual|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="table-{% if balance_mes_actual >= 0 %}success{% else %}danger{% endif %}">
+                                <th>Balance:</th>
+                                <td class="text-end fw-bold">S/ {{ balance_mes_actual|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Balance del Mes Anterior ({{ primer_dia_mes_anterior|date:"d/m/Y" }} - {{ ultimo_dia_mes_anterior|date:"d/m/Y" }})</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Total Ingresos:</th>
+                                <td class="text-end">S/ {{ ingresos_mes_anterior|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Egresos:</th>
+                                <td class="text-end">S/ {{ egresos_mes_anterior|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="table-{% if balance_mes_anterior >= 0 %}success{% else %}danger{% endif %}">
+                                <th>Balance:</th>
+                                <td class="text-end fw-bold">S/ {{ balance_mes_anterior|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Balance Total Histórico</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Total Ingresos:</th>
+                                <td class="text-end">S/ {{ ingresos_total|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th>Total Egresos:</th>
+                                <td class="text-end">S/ {{ egresos_total|floatformat:2 }}</td>
+                            </tr>
+                            <tr class="table-{% if balance_total >= 0 %}success{% else %}danger{% endif %}">
+                                <th>Balance:</th>
+                                <td class="text-end fw-bold">S/ {{ balance_total|floatformat:2 }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Ingresos por Categoría (Mes Actual)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th class="text-end">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categoria in categorias_ingresos %}
+                                <tr>
+                                    <td>{{ categoria.categoria__nombre }}</td>
+                                    <td class="text-end">S/ {{ categoria.total|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">No hay datos para mostrar</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-success">
+                                    <th>Total</th>
+                                    <th class="text-end">S/ {{ ingresos_mes_actual|floatformat:2 }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Egresos por Categoría (Mes Actual)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th class="text-end">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categoria in categorias_egresos %}
+                                <tr>
+                                    <td>{{ categoria.categoria__nombre }}</td>
+                                    <td class="text-end">S/ {{ categoria.total|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">No hay datos para mostrar</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-danger">
+                                    <th>Total</th>
+                                    <th class="text-end">S/ {{ egresos_mes_actual|floatformat:2 }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,484 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | APRODMAYO</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <style>
+        :root {
+            --primary: #702c8c;
+            --primary-dark: #493240;
+            --secondary: #6a4a77;
+            --accent: #8a4da8;
+        }
+        
+        body, html {
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            right: 50px;
+            animation-delay: 2s;
+        }
+        
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            top: 50%;
+            left: 60%;
+            animation-delay: 4s;
+        }
+        
+        .shape-4 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+                opacity: 0.5;
+            }
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-body {
+            padding: 0;
+        }
+        
+        .login-sidebar {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .login-sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.1;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo-img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .welcome-heading {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .welcome-subheading {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-list {
+            margin-top: auto;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .login-form-container {
+            padding: 3.5rem;
+        }
+        
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-control {
+            height: 56px;
+            border-radius: 10px;
+            border: 1px solid #e1e5ea;
+            padding: 1rem 1rem 1rem 3rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(112, 44, 140, 0.25);
+        }
+        
+        .form-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #adb5bd;
+            z-index: 5;
+        }
+        
+        .btn-login {
+            height: 56px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(112, 44, 140, 0.3);
+        }
+        
+        .btn-login:hover, .btn-login:focus {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(112, 44, 140, 0.4);
+        }
+        
+        .login-footer {
+            text-align: center;
+            color: #6c757d;
+            margin-top: 2.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        
+        /* Animaciones */
+        .animate-fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+        
+        .animate-fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease forwards;
+        }
+        
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+        
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .login-sidebar {
+                padding: 2rem;
+            }
+            
+            .login-form-container {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .login-card {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-pattern"></div>
+        
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+        
+        <div class="login-card animate-fade-in">
+            <div class="card-body">
+                <div class="row g-0">
+                    <!-- Sidebar con logo e información -->
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="login-sidebar h-100">
+                            <div class="logo-container animate-fade-in">
+                                <img src="{% static 'images/logo-white.png' %}" alt="APRODMAYO" class="logo-img">
+                                <h1 class="welcome-heading">¡Bienvenido/a!</h1>
+                                <p class="welcome-subheading">Sistema Integral de Gestión APRODMAYO</p>
+                            </div>
+                            
+                            <div class="feature-list">
+                                <div class="feature-item animate-fade-in-up delay-1">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                    <div class="feature-text">
+                                        Gestión integral de beneficiarias y programas de apoyo
+                                    </div>
+                                </div>
+                                <div class="feature-item animate-fade-in-up delay-2">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-graph-up"></i>
+                                    </div>
+                                    <div class="feature-text">
+                                        Seguimiento financiero transparente y efectivo
+                                    </div>
+                                </div>
+                                <div class="feature-item animate-fade-in-up delay-3">
+                                    <div class="feature-icon">
+                                        <i class="bi bi-calendar-check"></i>
+                                    </div>
+                                    <div class="feature-text">
+                                        Administración completa de talleres y capacitaciones
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulario de inicio de sesión -->
+                    <div class="col-lg-7">
+                        <div class="login-form-container">
+                            <div class="d-block d-lg-none text-center mb-4">
+                                <img src="{% static 'images/logo-original.jpg' %}" alt="APRODMAYO" style="max-width: 150px;">
+                            </div>
+                            
+                            <h2 class="login-title animate-fade-in-up">Iniciar Sesión</h2>
+                            <p class="login-subtitle animate-fade-in-up delay-1">Ingresa tus credenciales para acceder al sistema</p>
+                            
+                            {% if form.errors %}
+                            <div class="alert alert-danger animate__animated animate__headShake">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Las credenciales ingresadas son incorrectas. Inténtalo de nuevo.
+                            </div>
+                            {% endif %}
+                            
+                            <form method="post" action="{% url 'login' %}" class="animate-fade-in-up delay-1">
+                                {% csrf_token %}
+                                
+                                <!-- Campo de usuario -->
+                                <div class="position-relative mb-4">
+                                    <i class="bi bi-person-fill form-icon"></i>
+                                    <input type="text" name="username" id="id_username" class="form-control" placeholder="Nombre de usuario" required>
+                                </div>
+                                
+                                <!-- Campo de contraseña -->
+                                <div class="position-relative mb-3">
+                                    <i class="bi bi-lock-fill form-icon"></i>
+                                    <input type="password" name="password" id="id_password" class="form-control" placeholder="Contraseña" required>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                                        <label class="form-check-label" for="remember">Mantener sesión</label>
+                                    </div>
+                                    <a href="{% url 'password_reset' %}" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-login">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar Sesión
+                                    </button>
+                                </div>
+                                
+                                <input type="hidden" name="next" value="{{ next }}">
+                            </form>
+                            
+                            <div class="login-footer animate-fade-in-up delay-3">
+                                <p class="mb-1">© {% now "Y" %} APRODMAYO - Sistema de Gestión</p>
+                                <p class="small mb-0">Comprometidos con el bienestar de mujeres en situación de vulnerabilidad</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Eliminación - APRODMAYO{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h2 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <p class="mb-0">¿Está seguro que desea eliminar el acompañante <strong>{{ object.nombres }} {{ object.apellidos }}</strong>?</p>
+            <p class="mt-2 mb-0"><strong>Esta acción no se puede deshacer.</strong></p>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Información del Acompañante</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nombres:</strong> {{ object.nombres }}</p>
+                        <p><strong>Apellidos:</strong> {{ object.apellidos }}</p>
+                        <p><strong>Parentesco:</strong> {{ object.get_parentesco_display }}</p>
+                        {% if object.edad %}
+                            <p><strong>Edad:</strong> {{ object.edad }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if object.documento_identidad %}
+                            <p><strong>Documento:</strong> {{ object.documento_identidad }}</p>
+                        {% endif %}
+                        {% if object.telefono %}
+                            <p><strong>Teléfono:</strong> {{ object.telefono }}</p>
+                        {% endif %}
+                        {% if object.direccion %}
+                            <p><strong>Dirección:</strong> {{ object.direccion }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if object.observaciones %}
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <p><strong>Observaciones:</strong></p>
+                        <p class="border p-2 rounded">{{ object.observaciones }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'beneficiaria_detail' object.beneficiaria.pk %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
