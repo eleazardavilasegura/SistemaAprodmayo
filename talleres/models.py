@@ -4,6 +4,11 @@ from beneficiarias.models import Beneficiaria
 import uuid
 
 
+def generar_codigo_certificado():
+    """Genera un código único para certificados"""
+    return f"APRO-{uuid.uuid4().hex[:8].upper()}"
+
+
 class Taller(models.Model):
     """
     Modelo que representa un taller ofrecido por APRODMAYO.
@@ -413,7 +418,7 @@ class Certificado(models.Model):
         unique=True,
         verbose_name="Código del certificado",
         help_text="Código único que identifica al certificado",
-        default=lambda: f"APRO-{uuid.uuid4().hex[:8].upper()}"
+        default=generar_codigo_certificado
     )
     
     # Fecha de emisión

@@ -9,8 +9,6 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import models
 from django.http import HttpResponseForbidden
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
 # Importaciones de modelos de otras aplicaciones
 from beneficiarias.models import Beneficiaria
@@ -28,7 +26,6 @@ def is_admin(user):
     """
     return user.is_authenticated and user.is_admin()
 
-@method_decorator(csrf_exempt, name='dispatch')  # Solo para desarrollo, no recomendado para producción
 class CustomLoginView(LoginView):
     """
     Vista personalizada para el inicio de sesión.

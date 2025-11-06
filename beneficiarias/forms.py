@@ -34,8 +34,9 @@ class BeneficiariaForm(forms.ModelForm):
     )
     
     correo = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'ejemplo@correo.com'}),
         required=False,  # Email opcional
+        help_text="Ingrese un correo electrónico válido (opcional)"
     )
     
     # Campos de observaciones opcionales

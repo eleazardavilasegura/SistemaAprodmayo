@@ -7,9 +7,9 @@ from django.views.generic import View
 from django.template.loader import get_template
 import datetime
 import csv
-import xlsxwriter
 import io
-from xhtml2pdf import pisa
+# import xlsxwriter
+# from xhtml2pdf import pisa
 from usuarios.decorators import permiso_reportes_required, permiso_finanzas_required, permiso_beneficiarias_required, permiso_talleres_required
 from finanzas.models import Ingreso, Egreso, Socio, Categoria
 from beneficiarias.models import Beneficiaria
@@ -378,49 +378,10 @@ def reporte_talleres(request):
 def generar_pdf(template_path, context):
     """
     Genera un archivo PDF a partir de una plantilla y un contexto
+    NOTA: Temporalmente deshabilitado por falta de dependencias
     """
-    # Agregar la URL del logo para PDF
-    from django.conf import settings
-    import os
-    logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'logo-white.png')
-    context['logo_url'] = logo_path
-    
-    # Asegurarse de que la fecha de generación esté disponible
-    if 'fecha_generacion' not in context:
-        context['fecha_generacion'] = timezone.now()
-    
-    template = get_template(template_path)
-    html = template.render(context)
-    result = io.BytesIO()
-    
-    # Opciones para el PDF
-    pdf_options = {
-        'page-size': 'Letter',
-        'margin-top': '0.5in',
-        'margin-right': '0.5in',
-        'margin-bottom': '0.5in',
-        'margin-left': '0.5in',
-        'encoding': 'UTF-8',
-        'quiet': '',
-    }
-    
-    # Crear el PDF
-    pisa_status = pisa.CreatePDF(
-        html, 
-        dest=result,
-        link_callback=fetch_resources,
-    )
-    
-    # Verificar si hay errores
-    if pisa_status.err:
-        return HttpResponse('Error al generar el PDF: ' + str(pisa_status.err), status=400)
-    
-    # Devolver el PDF como respuesta
-    response = HttpResponse(result.getvalue(), content_type='application/pdf')
-    report_type = template_path.split('/')[-1].replace('.html', '')
-    response['Content-Disposition'] = f'attachment; filename=reporte_{report_type}_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf'
-    
-    return response
+    from django.http import HttpResponse
+    return HttpResponse("Funcionalidad de PDF temporalmente deshabilitada por falta de dependencias del sistema", content_type='text/plain')
 
 def fetch_resources(uri, rel):
     """
@@ -453,9 +414,10 @@ def fetch_resources(uri, rel):
 def exportar_balance_financiero_excel(context):
     """
     Exporta el reporte de balance financiero a Excel
+    NOTA: Temporalmente deshabilitado por falta de dependencias
     """
-    output = io.BytesIO()
-    workbook = xlsxwriter.Workbook(output)
+    from django.http import HttpResponse
+    return HttpResponse("Funcionalidad de Excel temporalmente deshabilitada por falta de dependencias del sistema", content_type='text/plain')
     worksheet = workbook.add_worksheet('Balance Financiero')
     
     # Formatos
@@ -568,9 +530,10 @@ def exportar_balance_financiero_excel(context):
 def exportar_beneficiarias_excel(context):
     """
     Exporta el reporte de beneficiarias a Excel
+    NOTA: Temporalmente deshabilitado por falta de dependencias
     """
-    output = io.BytesIO()
-    workbook = xlsxwriter.Workbook(output)
+    from django.http import HttpResponse
+    return HttpResponse("Funcionalidad de Excel temporalmente deshabilitada por falta de dependencias del sistema", content_type='text/plain')
     worksheet = workbook.add_worksheet('Beneficiarias')
     worksheet_acompanantes = workbook.add_worksheet('Acompañantes')
     
@@ -721,9 +684,10 @@ def exportar_beneficiarias_excel(context):
 def exportar_talleres_excel(context):
     """
     Exporta el reporte de talleres a Excel
+    NOTA: Temporalmente deshabilitado por falta de dependencias
     """
-    output = io.BytesIO()
-    workbook = xlsxwriter.Workbook(output)
+    from django.http import HttpResponse
+    return HttpResponse("Funcionalidad de Excel temporalmente deshabilitada por falta de dependencias del sistema", content_type='text/plain')
     worksheet = workbook.add_worksheet('Talleres')
     
     # Formatos

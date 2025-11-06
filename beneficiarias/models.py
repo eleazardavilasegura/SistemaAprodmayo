@@ -22,9 +22,9 @@ class Beneficiaria(models.Model):
     ], default='DNI')
     
     # Contacto
-    direccion = models.CharField(max_length=255, blank=True)
-    telefono = models.CharField(max_length=20, blank=True)
-    correo = models.EmailField(blank=True)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    correo = models.EmailField(blank=True, null=True)
     
     # Estado civil
     estado_civil = models.CharField(max_length=20, choices=[

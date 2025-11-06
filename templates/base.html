@@ -259,8 +259,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'dashboard' %}">
-                <img src="{% static 'images/logo-white.png' %}" alt="APRODMAYO" class="d-none d-sm-inline">
-                <span class="ms-2">APRODMAYO</span>
+                {% comment %}<img src="{% static 'images/logo-white.png' %}" alt="APRODMAYO" class="d-none d-sm-inline">{% endcomment %}
+                <i class="bi bi-heart-fill me-2"></i>
+                <span>APRODMAYO</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -450,6 +451,7 @@
             <div class="row align-items-center">
                 <div class="col-md-4">
                     <h5 class="mb-3">APRODMAYO</h5>
+                    <p class="mb-0 small">Asociación Protectora de los Derechos de la Mujer - Mayo</p>
                     <p class="mb-0 small">Sistema de gestión integral para apoyar a mujeres en situación de vulnerabilidad.</p>
                 </div>
                 <div class="col-md-4 text-center">
@@ -461,6 +463,7 @@
                 </div>
                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
                     <p class="mb-0 small">&copy; {% now "Y" %} APRODMAYO. Todos los derechos reservados.</p>
+                    <p class="mb-0 small">Desarrollado por <a href="https://github.com/eleazardavilasegura" class="text-white" target="_blank">Eleazar Davila Segura</a></p>
                 </div>
             </div>
         </div>
