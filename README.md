@@ -233,4 +233,3 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 - A todo el equipo de APRODMAYO (Asociación Protectora de los Derechos de la Mujer - Mayo) por su confianza
 - A las beneficiarias que inspiran este trabajo social
 - A la comunidad de desarrolladores de Django
-- A GitHub Copilot por la asistencia en el desarrollo
